@@ -2,8 +2,10 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes"
+    />
     <title>EPhone PWA</title>
     <link rel="stylesheet" href="style.css" />
     <link
@@ -512,10 +514,10 @@
       function openApp(frameId) {
         document.body.classList.add('app-open');
 
-        // 隐藏主屏幕 (模拟)
-        launcherScreen.style.opacity = '0';
-        launcherScreen.style.transform = 'scale(0.95)';
-
+        // 【修改】隐藏主屏幕：从 opacity 改为 display: none，让它彻底不占空间
+        launcherScreen.style.display = 'none'; 
+        // transform 可以保留，但因为元素已消失，效果不明显，也可以删掉
+        // launcherScreen.style.transform = 'scale(0.95)'; 
 
         frames.forEach(frame => {
           if (frame.id === frameId) {
@@ -542,10 +544,10 @@
       function goHome() {
         document.body.classList.remove('app-open');
 
-        // 恢复主屏幕
-        launcherScreen.style.opacity = '1';
-        launcherScreen.style.transform = 'scale(1)';
-
+        // 【修改】恢复主屏幕：从 opacity 改为 display: flex
+        launcherScreen.style.display = 'flex'; 
+        // transform 动画也恢复，让出现更自然
+        launcherScreen.style.transform = 'scale(1)'; 
         // 关闭所有 App
         setTimeout(() => {
           frames.forEach(frame => {
