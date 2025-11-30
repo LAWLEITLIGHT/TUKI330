@@ -552,6 +552,25 @@
         visibility: visible;
         transform: translateX(-50%) translateY(0);
       }
+
+      /* ★★★★★ 这里是你要复制进去的代码 开始 ★★★★★ */
+      /* 边缘感应层样式 */
+      .edge-sensor {
+        position: fixed;
+        z-index: 1500; /* 必须比App高 */
+        background: transparent; /* 透明看不见 */
+      }
+      /* 顶部感应条 */
+      .edge-sensor.top { top: 0; left: 0; width: 100%; height: 30px; }
+      /* 底部感应条 */
+      .edge-sensor.bottom { bottom: 0; left: 0; width: 100%; height: 30px; }
+      /* 左侧感应条 */
+      .edge-sensor.left { top: 30px; bottom: 30px; left: 0; width: 15px; }
+      /* 右侧感应条 */
+      .edge-sensor.right { top: 30px; bottom: 30px; right: 0; width: 15px; }
+      /* ★★★★★ 这里是你要复制进去的代码 结束 ★★★★★ */
+
+
     </style>
   </head>
   <body>
@@ -662,6 +681,14 @@
 
         <div id="fab-main"></div>
       </div>
+
+    <!-- ★★★★★ 这里是你要复制进去的代码 开始 ★★★★★ -->
+    <!-- 全屏边缘感应层 (用于在App内双击唤醒) -->
+    <div class="edge-sensor top"></div>
+    <div class="edge-sensor bottom"></div>
+    <div class="edge-sensor left"></div>
+    <div class="edge-sensor right"></div>
+    <!-- ★★★★★ 这里是你要复制进去的代码 结束 ★★★★★ -->
 
       <div id="toast-msg"></div>
     </div>
