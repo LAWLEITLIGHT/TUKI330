@@ -982,7 +982,7 @@
     </div>
 
     <script>
-      const fabContainer = document.getElementById('fab-container');
+       const fabContainer = document.getElementById('fab-container');
       const fabMain = document.getElementById('fab-main');
 
       // 这里把原来的 id="home-screen" 对应给 launcherScreen
@@ -1241,314 +1241,18 @@
           navigator.serviceWorker.register('sw.js');
         });
       }
+
       /* ===========================
-         第5步：逻辑核心 V5.0 (含悬浮窗/数据导出/多角色)
+         核心业务逻辑补全 (V5.0 终极版)
+         包含：数据存储、悬浮窗高级渲染、文案预设、API请求、单条目复制
          =========================== */
-      let timerPages = [];
-      let activeRoleId = 0; 
-      let activePageIndex = 0;
-      let roles = [];
-      let globalSettings = {
-        copyTemplate: "此条内容是ai写作指导，角色不可见。以下是角色原本的日程计划，注意角色可能之前之后都不按照原计划进行，请你根据上下文语境进行判断剧情发展：\n当前的世界是${currTime}，${timercontent}\n必须根据上下文判断角色是否之前或之后进行原计划，以及根据当前对话场景角色是否会提及此事，角色也可能已经忘记此事或直接根本不提。你作为ai必须自行判断做出有活人感的反应与结果。",
-        tplPast: "${min}分钟前，${char}原计划是在${time}${act}",
-        tplFuture: "${min}分钟后，${char}原计划是在${time}${act}",
-        flowMode: 'simple', // detail, simple, icon
-        flowRange: 15,
-        flowVisible: false,
-        iconNormal: "https://i.postimg.cc/B6FkXGCL/15.png",
-        iconActive: "https://i.postimg.cc/1tF2fZKF/16.png",
-        iconSize: 50
-      };
 
-      const STORAGE_KEYS = { api:'tuki_presets_api', char:'tuki_presets_char', user:'tuki_presets_user', prompt:'tuki_presets_prompt', roles:'tuki_roles_v1', global:'tuki_global_settings' };
-      const FIELD_MAP = { api:['api-preset-name','api-host','api-key','model-name'], char:['char-preset-name','char-name','char-persona','world-info','chat-history'], user:['user-preset-name','user-name','user-persona'], prompt:['prompt-preset-name','prompt-content'] };
-      const DEFAULT_PROMPT = `# 角色扮演任务\n请根据"\${chat.name}"的人设，推演接下来24小时的行为轨迹。\n# 参数\n角色：\${chat.name}\n人设：\${chat.settings.aiPersona}\n# 输出规则\n1. 返回JSON数组。2. 时间格式 "HH:mm"。3. 包含 'html_snippet' (可选)。\n[{"time":"08:00","description":"...","icon":"⏰"}]`;
-
-      window.addEventListener('load', () => {
-        ['api','char','user','prompt'].forEach(refreshDropdown);
-        const savedGlobal = localStorage.getItem(STORAGE_KEYS.global);
-        if(savedGlobal) globalSettings = {...globalSettings, ...JSON.parse(savedGlobal)};
-        document.getElementById('global-copy-template').value = globalSettings.copyTemplate;
-        document.getElementById('status-tpl-past').value = globalSettings.tplPast;
-        document.getElementById('status-tpl-future').value = globalSettings.tplFuture;
-        document.getElementById('flow-mode').value = globalSettings.flowMode;
-        document.getElementById('flow-range').value = globalSettings.flowRange;
-        document.getElementById('flow-icon-normal').value = globalSettings.iconNormal;
-        document.getElementById('flow-icon-active').value = globalSettings.iconActive;
-        document.getElementById('flow-icon-size').value = globalSettings.iconSize;
-
-        const savedRoles = localStorage.getItem(STORAGE_KEYS.roles);
-        if(savedRoles) roles = JSON.parse(savedRoles);
-        else roles = [{ id: Date.now(), name: "默认角色", pages: [{ id: Date.now(), name: "主日程", promptPreset: "", data: [], exportEnabled: true, exportMode: 'both' }] }];
-        activeRoleId = roles[0].id;
-
-        const prompts = getPresets('prompt');
-        if(Object.keys(prompts).length===0) {
-          prompts["默认日程"] = { "prompt-preset-name": "默认日程", "prompt-content": DEFAULT_PROMPT };
-          localStorage.setItem(STORAGE_KEYS.prompt, JSON.stringify(prompts));
-          refreshDropdown('prompt');
-        }
-        renderRoleUI();
-        updateFlowWindowVisibility();
-        setInterval(() => { updateRealTimeStatus(); renderFlowWindow(); }, 1000);
-      });
-
-      /* --- 悬浮窗逻辑 --- */
-      function toggleFlowWindow() {
-        globalSettings.flowVisible = !globalSettings.flowVisible;
-        saveGlobalSettings();
-        updateFlowWindowVisibility();
-      }
-      function updateFlowWindowVisibility() {
-        const widget = document.getElementById('flow-widget');
-        widget.style.display = globalSettings.flowVisible ? 'block' : 'none';
-        renderFlowWindow();
-      }
-      function getActiveEventsForFlow() {
-        const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-        const role = roles.find(r => r.id === activeRoleId);
-        if(!role) return { active: [], next: null };
-        
-        let activeItems = [];
-        let nextItems = [];
-        role.pages.forEach(p => {
-          if(!p.exportEnabled) return;
-          p.data.forEach(item => {
-            const [h,m] = item.time.split(':').map(Number);
-            const t = h*60+m;
-            const diff = Math.abs(t - curM);
-            if(diff <= globalSettings.flowRange) {
-              activeItems.push({ ...item, pageName: p.name });
-            } else if (t > curM) {
-              nextItems.push({ ...item, t: t });
-            }
-          });
-        });
-        nextItems.sort((a,b) => a.t - b.t);
-        return { active: activeItems, next: nextItems[0] };
-      }
-
-      function renderFlowWindow() {
-        if(!globalSettings.flowVisible) return;
-        const widget = document.getElementById('flow-widget');
-        const { active, next } = getActiveEventsForFlow();
-        const hasActive = active.length > 0;
-        const charName = document.getElementById('char-name').value || "TA";
-        
-        if(globalSettings.flowMode === 'icon') {
-          const url = hasActive ? globalSettings.iconActive : globalSettings.iconNormal;
-          const size = globalSettings.iconSize;
-          widget.innerHTML = `<img src="${url}" class="flow-icon-img" style="width:${size}px;height:${size}px;">`;
-        } else {
-          let html = `<div class="flow-card">`;
-          if (hasActive) {
-            const item = active[0]; 
-            const [h,m] = item.time.split(':').map(Number);
-            const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-            const diff = Math.abs(curM - (h*60+m));
-            if(globalSettings.flowMode === 'detail') {
-               const tpl = (curM > h*60+m) ? globalSettings.tplPast : globalSettings.tplFuture;
-               const txt = tpl.replace(/\${min}/g, diff).replace(/\${char}/g, charName).replace(/\${act}/g, item.description).replace(/\${time}/g, item.time);
-               html += `<div class="flow-content">${txt}</div>`;
-            } else {
-               html += `<div class="flow-content">${charName} ${diff}min</div><div class="flow-sub">${item.time}</div>`;
-            }
-          } else {
-            if(next) {
-               const [h,m] = next.time.split(':').map(Number);
-               const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-               const diff = (h*60+m) - curM;
-               html += `<div class="flow-content">Next: ${diff}min</div><div class="flow-sub">${next.time} ${next.description.substring(0,8)}...</div>`;
-            } else {
-               html += `<div class="flow-content">💤 休息中</div>`;
-            }
-          }
-          html += `</div>`;
-          widget.innerHTML = html;
-        }
-      }
-
-      function copyFromFlowWindow() {
-        const { active } = getActiveEventsForFlow();
-        const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-        const charName = document.getElementById('char-name').value || "TA";
-        
-        if(active.length > 0) {
-           let lines = [];
-           active.forEach(item => {
-              const [h,m] = item.time.split(':').map(Number);
-              const diff = Math.abs(curM - (h*60+m));
-              const tpl = (curM > h*60+m) ? globalSettings.tplPast : globalSettings.tplFuture;
-              lines.push(tpl.replace(/\${min}/g, diff).replace(/\${char}/g, charName).replace(/\${act}/g, item.description).replace(/\${time}/g, item.time));
-           });
-           const txt = globalSettings.copyTemplate.replace("${currTime}", now.toLocaleString()).replace("${timercontent}", lines.join("；"));
-           navigator.clipboard.writeText(txt).then(()=>showToast("已复制当前状态")).catch(()=>showToast("复制失败"));
-        } else {
-           const { next } = getActiveEventsForFlow();
-           if(next) {
-              const txt = `（系统）下一个事件预计在 ${next.time}：${next.description}`;
-              navigator.clipboard.writeText(txt).then(()=>showToast("已复制预告")).catch(()=>showToast("复制失败"));
-           }
-        }
-      }
-
-      /* --- 基础管理 --- */
-      function getPresets(type) { return JSON.parse(localStorage.getItem(STORAGE_KEYS[type])) || {}; }
-      function refreshDropdown(type) {
-        const presets = getPresets(type); const select = document.getElementById(`${type}-preset-select`);
-        const cur = select.value; select.innerHTML = '<option value="">-- 新建/选择 --</option>';
-        Object.keys(presets).forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.innerText=n; select.appendChild(opt); });
-        if(presets[cur]) select.value = cur;
-        if(type==='prompt') {
-           const ps = document.getElementById('page-prompt-select');
-           if(ps && getActivePage()) { ps.innerHTML='<option value="">-- 规则 --</option>'; Object.keys(presets).forEach(n=>{const o=document.createElement('option');o.value=n;o.innerText=n;ps.appendChild(o)}); ps.value=getActivePage().promptPreset||""; }
-        }
-      }
-      function loadPreset(type, name) { const f=FIELD_MAP[type]; if(!name){f.forEach(i=>document.getElementById(i).value='');return;} const d=getPresets(type)[name]; if(d)f.forEach(i=>{const e=document.getElementById(i);if(e)e.value=d[i]||''}); }
-      function savePreset(type) { const n=document.getElementById(`${type}-preset-name`).value.trim(); if(!n)return showToast('无名称'); const p=getPresets(type), d={}; FIELD_MAP[type].forEach(i=>d[i]=document.getElementById(i).value); p[n]=d; localStorage.setItem(STORAGE_KEYS[type],JSON.stringify(p)); refreshDropdown(type); document.getElementById(`${type}-preset-select`).value=n; showToast('已保存'); }
-      function deletePreset(type) { const n=document.getElementById(`${type}-preset-select`).value; if(n&&confirm('删除?')){const p=getPresets(type);delete p[n];localStorage.setItem(STORAGE_KEYS[type],JSON.stringify(p));loadPreset(type,'');refreshDropdown(type);showToast('已删除');} }
-      
-      function saveGlobalSettings() {
-        globalSettings.copyTemplate = document.getElementById('global-copy-template').value;
-        globalSettings.tplPast = document.getElementById('status-tpl-past').value;
-        globalSettings.tplFuture = document.getElementById('status-tpl-future').value;
-        globalSettings.flowMode = document.getElementById('flow-mode').value;
-        globalSettings.flowRange = parseInt(document.getElementById('flow-range').value);
-        globalSettings.iconNormal = document.getElementById('flow-icon-normal').value;
-        globalSettings.iconActive = document.getElementById('flow-icon-active').value;
-        globalSettings.iconSize = parseInt(document.getElementById('flow-icon-size').value);
-        localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings));
-        showToast("设置已保存"); updateFlowWindowVisibility();
-      }
-
-      /* --- 角色与页签 --- */
-      function renderRoleUI() {
-        const s = document.getElementById('role-select'); s.innerHTML='';
-        roles.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.innerText=r.name;s.appendChild(o)}); s.value=activeRoleId; renderTabs();
-      }
-      function getActiveRole() { return roles.find(r=>r.id==activeRoleId); }
-      function getActivePage() { return getActiveRole().pages[activePageIndex]; }
-      function switchRole(id) { activeRoleId=parseInt(id); activePageIndex=0; renderTabs(); }
-      function addNewRole() { const n=prompt("角色名:"); if(n){roles.push({id:Date.now(),name:n,pages:[{id:Date.now(),name:"日程",promptPreset:"",data:[],exportEnabled:true,exportMode:'both'}]});activeRoleId=roles[roles.length-1].id;activePageIndex=0;saveRoles();renderRoleUI();} }
-      function renameRole() { const r=getActiveRole(), n=prompt("重命名:",r.name); if(n){r.name=n;saveRoles();renderRoleUI();} }
-      function deleteRole() { if(roles.length<=1)return; if(confirm("删除角色?")){roles=roles.filter(r=>r.id!=activeRoleId);activeRoleId=roles[0].id;activePageIndex=0;saveRoles();renderRoleUI();} }
-      function saveRoles() { localStorage.setItem(STORAGE_KEYS.roles, JSON.stringify(roles)); }
-
-      function renderTabs() {
-        const c=document.getElementById('timer-tabs'); c.innerHTML='';
-        getActiveRole().pages.forEach((p,i)=>{const t=document.createElement('div');t.className=`tab-item ${i===activePageIndex?'active':''}`;t.innerText=p.name;t.onclick=()=>{activePageIndex=i;renderTabs()};c.appendChild(t)});
-        const b=document.createElement('div');b.className='tab-add-btn';b.innerText='+';b.onclick=addNewPage;c.appendChild(b);
-        const cp=getActivePage(); if(cp){ refreshDropdown('prompt'); document.getElementById('page-export-toggle').checked=cp.exportEnabled!==false; document.getElementById('page-export-mode').value=cp.exportMode||'both'; renderTimeline(); }
-      }
-      function addNewPage() { const n=prompt("页签名称:"); if(n){getActiveRole().pages.push({id:Date.now(),name:n,promptPreset:"",data:[],exportEnabled:true,exportMode:'both'});activePageIndex=getActiveRole().pages.length-1;saveRoles();renderTabs();} }
-      function deleteCurrentPage() { if(getActiveRole().pages.length<=1)return; if(confirm("删除页签?")){getActiveRole().pages.splice(activePageIndex,1);activePageIndex=0;saveRoles();renderTabs();} }
-      function clearCurrentPage() { if(confirm("清空数据?")){getActivePage().data=[];saveRoles();renderTimeline();} }
-      function bindPromptToPage(v) { getActivePage().promptPreset=v; saveRoles(); }
-      function updatePageExportSettings() { const p=getActivePage(); p.exportEnabled=document.getElementById('page-export-toggle').checked; p.exportMode=document.getElementById('page-export-mode').value; saveRoles(); }
-
-      /* --- API与生成 --- */
-      async function fetchModels() {
-        const h=document.getElementById('api-host').value.replace(/\/$/,''), k=document.getElementById('api-key').value;
-        if(!h||!k) return showToast('缺Host/Key');
-        try { const r=await fetch(`${h}/v1/models`,{headers:{'Authorization':`Bearer ${k}`}}); const d=await r.json(); const l=document.getElementById('model-list-dropdown'); l.innerHTML='<option>--选模型--</option>'; d.data.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.innerText=m.id;l.appendChild(o)}); l.style.display='block'; showToast(`OK: ${d.data.length}`); } catch(e){alert(e.message);}
-      }
-      function insertVar(t) { const e=document.getElementById('prompt-content'), s=e.selectionStart; e.value=e.value.substring(0,s)+t+e.value.substring(e.selectionEnd); e.focus(); }
-      async function generateSchedule(append) {
-        const h=document.getElementById('api-host').value.replace(/\/$/,''), k=document.getElementById('api-key').value, m=document.getElementById('model-name').value;
-        if(!h||!k) return showToast('请配置API');
-        const p=getActivePage(), pr=getPresets('prompt')[p.promptPreset]?.['prompt-content'];
-        if(!pr) return showToast('缺提示词');
-        const v=id=>document.getElementById(id).value||'';
-        const final=pr.replace(/\${chat.name}/g,v('char-name')).replace(/\${chat.settings.aiPersona}/g,v('char-persona')).replace(/\${chat.settings.worldinfo}/g,v('world-info')).replace(/\${chat.settings.history}/g,v('chat-history')).replace(/\${user.name}/g,v('user-name')).replace(/\${user.settings.aiPersona}/g,v('user-persona'));
-        
-        const l=document.getElementById('schedule-loading'), b1=document.getElementById('btn-gen-schedule'), b2=document.getElementById('btn-append-schedule');
-        l.style.display='block'; b1.disabled=b2.disabled=true;
-        try {
-          const r=await fetch(`${h}/v1/chat/completions`,{method:'POST',headers:{'Authorization':`Bearer ${k}`,'Content-Type':'application/json'},body:JSON.stringify({model:m,messages:[{role:"system",content:"JSON Array Only"},{role:"user",content:final}],temperature:0.7})});
-          const d=await r.json(), txt=d.choices[0].message.content.replace(/```json|```/g,'').trim(), nd=JSON.parse(txt);
-          p.data = append ? [...p.data,...nd] : nd; p.data.sort((a,b)=>a.time.localeCompare(b.time));
-          saveRoles(); renderTimeline(); showToast('完成');
-        } catch(e) { alert(e.message); } finally { l.style.display='none'; b1.disabled=b2.disabled=false; }
-      }
-
-      /* --- 渲染与复制 --- */
-      function renderTimeline() {
-        const b=document.getElementById('schedule-result-area'), d=getActivePage()?.data||[];
-        b.innerHTML = d.length ? '' : '<div style="text-align:center;color:#aaa;padding:20px">暂无数据</div>';
-        d.forEach((item,i)=>{
-          const c=document.createElement('div'); c.className='timeline-card'; c.id=`card-${i}`;
-          c.innerHTML=`<div class="t-header"><div class="t-time">${item.time}</div><div style="font-size:20px">${item.icon||'📱'}</div></div><div class="t-desc">${item.description}</div>${item.html_snippet||''}<div class="card-actions"><button class="card-btn edit" onclick="editItem(${i})">✏️</button><button class="card-btn del" onclick="delItem(${i})">🗑️</button></div>`;
-          b.appendChild(c);
-        });
-        updateRealTimeStatus();
-      }
-      function editItem(i) { const d=getActivePage().data, v=prompt("修改:",d[i].description); if(v){d[i].description=v;saveRoles();renderTimeline();} }
-      function delItem(i) { if(confirm("删除?")){getActivePage().data.splice(i,1);saveRoles();renderTimeline();} }
-
-      function updateRealTimeStatus() {
-        const d = getActivePage()?.data || [];
-        if(!d.length) return;
-        const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-        let aidx = -1;
-        document.querySelectorAll('.timeline-card').forEach(c=>c.classList.remove('active-now'));
-        for(let i=0;i<d.length;i++){const[h,m]=d[i].time.split(':').map(Number);if(curM>=h*60+m)aidx=i;else break;}
-        if(aidx!==-1) document.getElementById(`card-${aidx}`)?.classList.add('active-now');
-        
-        const p = getActivePage();
-        const tp = {...p, exportMode:'past'}, tf = {...p, exportMode:'future'};
-        document.getElementById('rt-past').innerText = getStatusStringForPage(tp, curM, true).join('') || "（无进行中）";
-        document.getElementById('rt-future').innerText = getStatusStringForPage(tf, curM, true).join('') || "（无后续）";
-      }
-
-      function getStatusStringForPage(page, curM, isExport) {
-        if(!page.data || !page.data.length) return [];
-        let idx = -1;
-        for(let i=0;i<page.data.length;i++){const[h,m]=page.data[i].time.split(':').map(Number);if(curM>=h*60+m)idx=i;else break;}
-        const char = document.getElementById('char-name').value || "TA";
-        let res = [];
-        const fmt = (t,min,act,tm) => t.replace(/\${min}/g,min).replace(/\${char}/g,char).replace(/\${act}/g,act).replace(/\${time}/g,tm);
-        
-        if(idx!==-1 && (!isExport || page.exportMode!=='future')) {
-           const it=page.data[idx], [h,m]=it.time.split(':').map(Number);
-           res.push(fmt(globalSettings.tplPast, curM-(h*60+m), it.description, it.time));
-        }
-        if((!isExport || page.exportMode!=='past')) {
-           let nidx = idx===-1 ? 0 : idx+1;
-           if(nidx < page.data.length) {
-             const it=page.data[nidx], [h,m]=it.time.split(':').map(Number);
-             res.push(fmt(globalSettings.tplFuture, (h*60+m)-curM, it.description, it.time));
-           }
-        }
-        return res;
-      }
-
-      function copyGlobalContext() {
-        const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-        const role = getActiveRole();
-        let all = [];
-        role.pages.forEach(p => {
-          if(p.exportEnabled!==false) {
-             const s = getStatusStringForPage(p, curM, true);
-             if(s.length) all.push(s.join("；"));
-          }
-        });
-        const txt = globalSettings.copyTemplate.replace("${currTime}", now.toLocaleString()).replace("${timercontent}", all.join("\n"));
-        navigator.clipboard.writeText(txt).then(()=>showToast("已复制上下文")).catch(()=>showToast("失败"));
-      }
-
-      function exportData() { const d={}; Object.keys(STORAGE_KEYS).forEach(k=>d[k]=localStorage.getItem(STORAGE_KEYS[k])); const b=new Blob([JSON.stringify(d)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); }
-      function importData(i) { const f=i.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.keys(d).forEach(k=>localStorage.setItem(k,d[k]));alert("导入成功");location.reload();}catch(x){alert("错误")}}; r.readAsText(f); }
-  /* ===========================
-         第5步：逻辑核心 V5.0 (含悬浮窗/数据导出/多角色/单项复制)
-         =========================== */
-      
-      // --- 默认文案配置常量 ---
+      // 默认文案配置常量
       const DEFAULT_COPY_TPL = "此条内容是ai写作指导，角色不可见。以下是角色原本的日程计划，注意角色可能之前之后都不按照原计划进行，请你根据上下文语境进行判断剧情发展：\n${timercontent}\n必须根据上下文判断角色是否之前或之后进行原计划，以及根据当前对话场景角色是否会提及此事，角色也可能已经忘记此事或直接根本不提。你作为ai必须自行判断做出有活人感的反应与结果。";
       const DEFAULT_PAST = "${min}分钟前，${char}原计划是${act}";
       const DEFAULT_FUTURE = "${min}分钟后，${char}原计划是${act}";
-      const DEFAULT_PROMPT = `# 角色扮演任务\n请根据"\${chat.name}"的人设，推演接下来24小时的行为轨迹。\n# 参数\n角色：\${chat.name}\n人设：\${chat.settings.aiPersona}\n# 输出规则\n1. 返回JSON数组。2. 时间格式 "HH:mm"。3. 包含 'html_snippet' (可选)。\n[{"time":"08:00","description":"...","icon":"⏰"}]`;
 
-      // --- 全局设置 ---
+      // 全局设置初始化
       let globalSettings = {
         copyTemplate: DEFAULT_COPY_TPL,
         tplPast: DEFAULT_PAST,
@@ -1559,23 +1263,23 @@
         iconNormal: "https://i.postimg.cc/B6FkXGCL/15.png",
         iconActive: "https://i.postimg.cc/1tF2fZKF/16.png",
         iconSize: 50,
-        flowWidth: 160, // [新增] 悬浮窗宽度
-        flowPosX: null, // [新增] 记录X位置
-        flowPosY: null  // [新增] 记录Y位置
+        flowWidth: 160,     // 悬浮窗宽度
+        flowPosX: null,     // 悬浮窗X坐标
+        flowPosY: null      // 悬浮窗Y坐标
       };
 
-      // 数据存储键值 (增加 copy 键)
+      // 存储键名定义 (增加了 'copy' 以支持文案预设全量备份)
       const STORAGE_KEYS = { 
         api:'tuki_presets_api', 
         char:'tuki_presets_char', 
         user:'tuki_presets_user', 
         prompt:'tuki_presets_prompt', 
-        copy:'tuki_presets_copy', // [新增] 文案预设
+        copy:'tuki_presets_copy', 
         roles:'tuki_roles_v1', 
         global:'tuki_global_settings' 
       };
 
-      // 字段映射表 (增加 copy 映射)
+      // 字段映射 (用于导入导出和预设加载)
       const FIELD_MAP = { 
         api:['api-preset-name','api-host','api-key','model-name'], 
         char:['char-preset-name','char-name','char-persona','world-info','chat-history'], 
@@ -1584,81 +1288,128 @@
         copy:['copy-preset-name','global-copy-template','status-tpl-past','status-tpl-future'] 
       };
 
+      const DEFAULT_PROMPT = `# 角色扮演任务\n请根据"\${chat.name}"的人设，推演接下来24小时的行为轨迹。\n# 参数\n角色：\${chat.name}\n人设：\${chat.settings.aiPersona}\n# 输出规则\n1. 返回JSON数组。2. 时间格式 "HH:mm"。3. 包含 'html_snippet' (可选)。\n[{"time":"08:00","description":"...","icon":"⏰"}]`;
+
+      // 运行时变量
       let timerPages = [];
       let activeRoleId = 0; 
       let activePageIndex = 0;
       let roles = [];
+      let flowCycleIndex = 0; // 用于不剧透模式的循环显示
 
-      // --- 初始化加载 ---
+      // --- 初始化加载逻辑 ---
       window.addEventListener('load', () => {
-        // 加载所有下拉框 (含 copy)
+        // 1. 初始化所有预设下拉框
         ['api','char','user','prompt','copy'].forEach(refreshDropdown);
-        
-        // 加载全局设置
+
+        // 2. 加载全局设置
         const savedGlobal = localStorage.getItem(STORAGE_KEYS.global);
         if(savedGlobal) globalSettings = {...globalSettings, ...JSON.parse(savedGlobal)};
-        
-        // 填充设置页表单 (空值回退默认)
+
+        // 确保空值回退默认
         if(!globalSettings.copyTemplate) globalSettings.copyTemplate = DEFAULT_COPY_TPL;
         if(!globalSettings.tplPast) globalSettings.tplPast = DEFAULT_PAST;
         if(!globalSettings.tplFuture) globalSettings.tplFuture = DEFAULT_FUTURE;
 
-        document.getElementById('global-copy-template').value = globalSettings.copyTemplate;
-        document.getElementById('status-tpl-past').value = globalSettings.tplPast;
-        document.getElementById('status-tpl-future').value = globalSettings.tplFuture;
-        
-        document.getElementById('flow-mode').value = globalSettings.flowMode;
-        document.getElementById('flow-range').value = globalSettings.flowRange;
-        document.getElementById('flow-icon-normal').value = globalSettings.iconNormal;
-        document.getElementById('flow-icon-active').value = globalSettings.iconActive;
-        document.getElementById('flow-icon-size').value = globalSettings.iconSize;
-        document.getElementById('flow-width').value = globalSettings.flowWidth || 160;
+        // 填充设置页面的输入框
+        const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+        safeSet('global-copy-template', globalSettings.copyTemplate);
+        safeSet('status-tpl-past', globalSettings.tplPast);
+        safeSet('status-tpl-future', globalSettings.tplFuture);
+        safeSet('flow-mode', globalSettings.flowMode);
+        safeSet('flow-range', globalSettings.flowRange);
+        safeSet('flow-icon-normal', globalSettings.iconNormal);
+        safeSet('flow-icon-active', globalSettings.iconActive);
+        safeSet('flow-icon-size', globalSettings.iconSize);
+        safeSet('flow-width', globalSettings.flowWidth || 160);
 
-        // 初始化悬浮窗位置
+        // 3. 初始化悬浮窗位置与拖拽
         const widget = document.getElementById('flow-widget');
         if(globalSettings.flowPosX) widget.style.left = globalSettings.flowPosX + 'px';
         if(globalSettings.flowPosY) widget.style.top = globalSettings.flowPosY + 'px';
-        widget.style.right = 'auto'; // 清除默认 right 避免冲突
+        widget.style.right = 'auto'; 
+        initDraggable(widget); // 启动悬浮窗拖拽逻辑
 
-        // 启动悬浮窗拖拽
-        initDraggable(widget);
-
-        // 加载角色数据
+        // 4. 加载角色数据
         const savedRoles = localStorage.getItem(STORAGE_KEYS.roles);
         if(savedRoles) roles = JSON.parse(savedRoles);
         else roles = [{ id: Date.now(), name: "默认角色", pages: [{ id: Date.now(), name: "主日程", promptPreset: "", data: [], exportEnabled: true, exportMode: 'both' }] }];
         activeRoleId = roles[0].id;
 
-        // 默认提示词检查
+        // 5. 初始化默认提示词
         const prompts = getPresets('prompt');
         if(Object.keys(prompts).length===0) {
           prompts["默认日程"] = { "prompt-preset-name": "默认日程", "prompt-content": DEFAULT_PROMPT };
           localStorage.setItem(STORAGE_KEYS.prompt, JSON.stringify(prompts));
           refreshDropdown('prompt');
         }
-        
+
+        // 6. 启动 UI 与 定时器
         renderRoleUI();
         updateFlowWindowVisibility();
         
-        // 启动计时器：1秒刷新状态，3秒切换不剧透轮播
+        // 核心心跳：每秒刷新状态与悬浮窗
         setInterval(() => { updateRealTimeStatus(); renderFlowWindow(); }, 1000);
-        setInterval(() => { cycleFlowIndex(); }, 3000); 
+        // 辅助心跳：每3秒切换一次不剧透模式的显示内容
+        setInterval(() => { flowCycleIndex++; }, 3000); 
       });
 
-      /* --- 悬浮窗逻辑 (核心交互) --- */
+      /* --- 悬浮窗逻辑核心 --- */
+      
+      // 切换开关
       function toggleFlowWindow() {
         globalSettings.flowVisible = !globalSettings.flowVisible;
         saveGlobalSettings();
         updateFlowWindowVisibility();
       }
-      
+
+      // 更新可见性
       function updateFlowWindowVisibility() {
         const widget = document.getElementById('flow-widget');
         widget.style.display = globalSettings.flowVisible ? 'block' : 'none';
         renderFlowWindow();
       }
 
-      // 获取当前活跃事件
+      // 悬浮窗拖拽功能
+      function initDraggable(el) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        const onStart = (e) => {
+           isDragging = true;
+           const t = e.touches ? e.touches[0] : e;
+           startX = t.clientX; startY = t.clientY;
+           const rect = el.getBoundingClientRect();
+           initLeft = rect.left; initTop = rect.top;
+           el.style.transition = 'none'; // 拖拽时取消动画，跟手更紧
+        };
+        const onMove = (e) => {
+          if(!isDragging) return;
+          e.preventDefault();
+          const t = e.touches ? e.touches[0] : e;
+          const dx = t.clientX - startX;
+          const dy = t.clientY - startY;
+          el.style.left = (initLeft + dx) + 'px';
+          el.style.top = (initTop + dy) + 'px';
+        };
+        const onEnd = () => {
+          if(isDragging) {
+             isDragging = false;
+             el.style.transition = 'opacity 0.3s'; // 恢复过渡
+             // 记录位置
+             const rect = el.getBoundingClientRect();
+             globalSettings.flowPosX = rect.left;
+             globalSettings.flowPosY = rect.top;
+             localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings));
+          }
+        };
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('touchstart', onStart, {passive:false});
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, {passive:false});
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchend', onEnd);
+      }
+
+      // 获取当前需要展示的事件
       function getActiveEventsForFlow() {
         const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
         const role = roles.find(r => r.id === activeRoleId);
@@ -1683,7 +1434,7 @@
         return { active: activeItems, next: nextItems[0] };
       }
 
-      // 渲染悬浮窗 (高级UI)
+      // 渲染悬浮窗 (高级感UI实现)
       function renderFlowWindow() {
         if(!globalSettings.flowVisible) return;
         const widget = document.getElementById('flow-widget');
@@ -1694,7 +1445,7 @@
         const size = globalSettings.iconSize;
         const width = globalSettings.flowWidth || 160;
 
-        // 1. 仅图标模式 (无边框，纯图片)
+        // 模式1: 仅图标 (无边框，纯图片)
         if(globalSettings.flowMode === 'icon') {
            widget.style.width = size + 'px';
            widget.style.height = size + 'px';
@@ -1702,23 +1453,20 @@
            widget.style.background = 'transparent';
            widget.style.border = 'none';
            widget.style.padding = '0';
-           widget.style.boxShadow = 'none';
-           
            const url = hasActive ? globalSettings.iconActive : globalSettings.iconNormal;
            widget.innerHTML = `<div class="flow-icon-container"><img src="${url}" class="flow-icon-img"></div>`;
            return;
         }
 
-        // 恢复文字模式的半透明玻璃态
+        // 通用样式恢复 (半透明灰底白字)
         widget.style.width = width + 'px';
         widget.style.height = 'auto';
         widget.style.borderRadius = '30px';
         widget.style.background = 'rgba(45, 45, 45, 0.75)';
         widget.style.border = '1px solid rgba(255, 255, 255, 0.15)';
         widget.style.padding = '0';
-        widget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
 
-        // 2. 详细展示模式 (单行滚动)
+        // 模式2: 详细展示 (单行滚动)
         if(globalSettings.flowMode === 'detail') {
            let txt = "暂无进行中事件";
            if(hasActive) {
@@ -1732,10 +1480,9 @@
              txt = `预告: ${next.time} ${next.description}`;
            }
            
-           // 简单估算是否需要滚动
+           // 简单的字数判断是否滚动
            const needScroll = txt.length > (width / 14); 
            const scrollClass = needScroll ? '' : 'static';
-           
            widget.innerHTML = `
              <div class="flow-detail-container">
                <div class="marquee-wrapper">
@@ -1743,7 +1490,7 @@
                </div>
              </div>`;
 
-        // 3. 不剧透模式 (呼吸闪烁 + 轮播)
+        // 模式3: 不剧透展示 (呼吸效果 + 轮播)
         } else {
            let contentHtml = "";
            if(hasActive) {
@@ -1769,7 +1516,7 @@
 
       // 点击悬浮窗复制
       function copyFromFlowWindow() {
-        const { active } = getActiveEventsForFlow();
+        const { active, next } = getActiveEventsForFlow();
         const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
         const charName = document.getElementById('char-name').value || "TA";
         
@@ -1783,124 +1530,75 @@
            });
            const txt = globalSettings.copyTemplate.replace("${currTime}", now.toLocaleString()).replace("${timercontent}", lines.join("；"));
            navigator.clipboard.writeText(txt).then(()=>showToast("已复制当前状态")).catch(()=>showToast("复制失败"));
-        } else {
-           const { next } = getActiveEventsForFlow();
-           if(next) {
-              const txt = `（系统）下一个事件预计在 ${next.time}：${next.description}`;
-              navigator.clipboard.writeText(txt).then(()=>showToast("已复制预告")).catch(()=>showToast("复制失败"));
-           }
+        } else if(next) {
+           const txt = `（系统）下一个事件预计在 ${next.time}：${next.description}`;
+           navigator.clipboard.writeText(txt).then(()=>showToast("已复制预告"));
         }
       }
-      
-      // 拖拽逻辑实现
-      function initDraggable(el) {
-        let isDragging = false, startX, startY, initLeft, initTop;
-        const onStart = (e) => {
-           isDragging = true;
-           const t = e.touches ? e.touches[0] : e;
-           startX = t.clientX; startY = t.clientY;
-           const rect = el.getBoundingClientRect();
-           initLeft = rect.left; initTop = rect.top;
-           el.style.transition = 'none'; 
-        };
-        const onMove = (e) => {
-          if(!isDragging) return;
-          e.preventDefault();
-          const t = e.touches ? e.touches[0] : e;
-          const dx = t.clientX - startX;
-          const dy = t.clientY - startY;
-          el.style.left = (initLeft + dx) + 'px';
-          el.style.top = (initTop + dy) + 'px';
-        };
-        const onEnd = () => {
-          if(isDragging) {
-             isDragging = false;
-             el.style.transition = 'opacity 0.3s';
-             // 拖动结束保存位置
-             const rect = el.getBoundingClientRect();
-             globalSettings.flowPosX = rect.left;
-             globalSettings.flowPosY = rect.top;
-             localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings));
-          }
-        };
-        el.addEventListener('mousedown', onStart);
-        el.addEventListener('touchstart', onStart, {passive:false});
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('touchmove', onMove, {passive:false});
-        document.addEventListener('mouseup', onEnd);
-        document.addEventListener('touchend', onEnd);
-      }
-      
-      let flowCycleIndex = 0;
-      function cycleFlowIndex() { flowCycleIndex++; }
 
-      /* --- 预设与数据管理 --- */
+      /* --- 数据管理 (预设、保存、导入导出) --- */
       function getPresets(type) { return JSON.parse(localStorage.getItem(STORAGE_KEYS[type])) || {}; }
       
       function refreshDropdown(type) {
         const presets = getPresets(type); 
-        const select = document.getElementById(type==='copy' ? 'copy-preset-select' : `${type}-preset-select`);
-        if(!select) return; // 容错
+        const select = document.getElementById(`${type}-preset-select`);
+        if(!select) return; // copy的select可能叫 copy-preset-select
         const cur = select.value; 
         select.innerHTML = '<option value="">-- 新建/选择 --</option>';
         Object.keys(presets).forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.innerText=n; select.appendChild(opt); });
         if(presets[cur]) select.value = cur;
         
-        // 特殊处理页面提示词下拉
+        // 特殊处理 prompt 在页签设置里的联动
         if(type==='prompt') {
            const ps = document.getElementById('page-prompt-select');
-           if(ps && getActivePage()) { ps.innerHTML='<option value="">-- 规则 --</option>'; Object.keys(presets).forEach(n=>{const o=document.createElement('option');o.value=n;o.innerText=n;ps.appendChild(o)}); ps.value=getActivePage().promptPreset||""; }
+           if(ps && getActivePage()) { 
+             ps.innerHTML='<option value="">-- 规则 --</option>'; 
+             Object.keys(presets).forEach(n=>{const o=document.createElement('option');o.value=n;o.innerText=n;ps.appendChild(o)}); 
+             ps.value=getActivePage().promptPreset||""; 
+           }
         }
       }
 
       function loadPreset(type, name) { 
-        const f = FIELD_MAP[type]; 
-        if(!name){ f.forEach(i=>document.getElementById(i).value=''); return; } 
-        const d = getPresets(type)[name]; 
-        if(d) f.forEach(i=>{ const e=document.getElementById(i); if(e) e.value=d[i]||''; }); 
+        const f=FIELD_MAP[type]; 
+        if(!name){f.forEach(i=>{const e=document.getElementById(i); if(e)e.value='';});return;} 
+        const d=getPresets(type)[name]; 
+        if(d)f.forEach(i=>{const e=document.getElementById(i);if(e)e.value=d[i]||''}); 
       }
 
       function savePreset(type) { 
-        const nameInput = document.getElementById(type==='copy' ? 'copy-preset-name' : `${type}-preset-name`);
-        const n = nameInput.value.trim(); 
-        if(!n) return showToast('无名称'); 
-        
-        const p = getPresets(type), d = {}; 
-        FIELD_MAP[type].forEach(i => d[i] = document.getElementById(i).value); 
-        p[n] = d; 
-        
-        localStorage.setItem(STORAGE_KEYS[type], JSON.stringify(p)); 
+        const nameInput = document.getElementById(`${type}-preset-name`);
+        const n=nameInput.value.trim(); 
+        if(!n)return showToast('无名称'); 
+        const p=getPresets(type), d={}; 
+        FIELD_MAP[type].forEach(i=>d[i]=document.getElementById(i).value); 
+        p[n]=d; 
+        localStorage.setItem(STORAGE_KEYS[type],JSON.stringify(p)); 
         refreshDropdown(type); 
-        
-        const select = document.getElementById(type==='copy' ? 'copy-preset-select' : `${type}-preset-select`);
-        select.value = n; 
+        document.getElementById(`${type}-preset-select`).value=n; 
         showToast('已保存'); 
       }
 
       function deletePreset(type) { 
-        const select = document.getElementById(type==='copy' ? 'copy-preset-select' : `${type}-preset-select`);
-        const n = select.value; 
-        if(n && confirm('删除?')) {
-           const p = getPresets(type); delete p[n]; 
-           localStorage.setItem(STORAGE_KEYS[type], JSON.stringify(p)); 
-           loadPreset(type, ''); refreshDropdown(type); 
-           showToast('已删除');
+        const n=document.getElementById(`${type}-preset-select`).value; 
+        if(n&&confirm('删除?')){
+          const p=getPresets(type); delete p[n];
+          localStorage.setItem(STORAGE_KEYS[type],JSON.stringify(p));
+          loadPreset(type,''); refreshDropdown(type); showToast('已删除');
         } 
       }
       
-      // 保存全局设置 (包含悬浮窗尺寸与位置)
       function saveGlobalSettings() {
         globalSettings.copyTemplate = document.getElementById('global-copy-template').value;
         globalSettings.tplPast = document.getElementById('status-tpl-past').value;
         globalSettings.tplFuture = document.getElementById('status-tpl-future').value;
-        
         globalSettings.flowMode = document.getElementById('flow-mode').value;
         globalSettings.flowRange = parseInt(document.getElementById('flow-range').value);
         globalSettings.iconNormal = document.getElementById('flow-icon-normal').value;
         globalSettings.iconActive = document.getElementById('flow-icon-active').value;
         globalSettings.iconSize = parseInt(document.getElementById('flow-icon-size').value);
-        globalSettings.flowWidth = parseInt(document.getElementById('flow-width').value);
-
+        globalSettings.flowWidth = parseInt(document.getElementById('flow-width').value); // 保存宽度
+        
         localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings));
         showToast("设置已保存"); updateFlowWindowVisibility();
       }
@@ -1908,7 +1606,9 @@
       /* --- 角色与页签管理 --- */
       function renderRoleUI() {
         const s = document.getElementById('role-select'); s.innerHTML='';
-        roles.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.innerText=r.name;s.appendChild(o)}); s.value=activeRoleId; renderTabs();
+        roles.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.innerText=r.name;s.appendChild(o)}); 
+        s.value=activeRoleId; 
+        renderTabs();
       }
       function getActiveRole() { return roles.find(r=>r.id==activeRoleId); }
       function getActivePage() { return getActiveRole().pages[activePageIndex]; }
@@ -1922,7 +1622,13 @@
         const c=document.getElementById('timer-tabs'); c.innerHTML='';
         getActiveRole().pages.forEach((p,i)=>{const t=document.createElement('div');t.className=`tab-item ${i===activePageIndex?'active':''}`;t.innerText=p.name;t.onclick=()=>{activePageIndex=i;renderTabs()};c.appendChild(t)});
         const b=document.createElement('div');b.className='tab-add-btn';b.innerText='+';b.onclick=addNewPage;c.appendChild(b);
-        const cp=getActivePage(); if(cp){ refreshDropdown('prompt'); document.getElementById('page-export-toggle').checked=cp.exportEnabled!==false; document.getElementById('page-export-mode').value=cp.exportMode||'both'; renderTimeline(); }
+        const cp=getActivePage(); 
+        if(cp){ 
+          refreshDropdown('prompt'); 
+          document.getElementById('page-export-toggle').checked=cp.exportEnabled!==false; 
+          document.getElementById('page-export-mode').value=cp.exportMode||'both'; 
+          renderTimeline(); 
+        }
       }
       function addNewPage() { const n=prompt("页签名称:"); if(n){getActiveRole().pages.push({id:Date.now(),name:n,promptPreset:"",data:[],exportEnabled:true,exportMode:'both'});activePageIndex=getActiveRole().pages.length-1;saveRoles();renderTabs();} }
       function deleteCurrentPage() { if(getActiveRole().pages.length<=1)return; if(confirm("删除页签?")){getActiveRole().pages.splice(activePageIndex,1);activePageIndex=0;saveRoles();renderTabs();} }
@@ -1930,13 +1636,14 @@
       function bindPromptToPage(v) { getActivePage().promptPreset=v; saveRoles(); }
       function updatePageExportSettings() { const p=getActivePage(); p.exportEnabled=document.getElementById('page-export-toggle').checked; p.exportMode=document.getElementById('page-export-mode').value; saveRoles(); }
 
-      /* --- API与生成 --- */
+      /* --- API 生成逻辑 --- */
       async function fetchModels() {
         const h=document.getElementById('api-host').value.replace(/\/$/,''), k=document.getElementById('api-key').value;
         if(!h||!k) return showToast('缺Host/Key');
         try { const r=await fetch(`${h}/v1/models`,{headers:{'Authorization':`Bearer ${k}`}}); const d=await r.json(); const l=document.getElementById('model-list-dropdown'); l.innerHTML='<option>--选模型--</option>'; d.data.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.innerText=m.id;l.appendChild(o)}); l.style.display='block'; showToast(`OK: ${d.data.length}`); } catch(e){alert(e.message);}
       }
       function insertVar(t) { const e=document.getElementById('prompt-content'), s=e.selectionStart; e.value=e.value.substring(0,s)+t+e.value.substring(e.selectionEnd); e.focus(); }
+      
       async function generateSchedule(append) {
         const h=document.getElementById('api-host').value.replace(/\/$/,''), k=document.getElementById('api-key').value, m=document.getElementById('model-name').value;
         if(!h||!k) return showToast('请配置API');
@@ -1955,40 +1662,40 @@
         } catch(e) { alert(e.message); } finally { l.style.display='none'; b1.disabled=b2.disabled=false; }
       }
 
-      /* --- 渲染与复制列表 --- */
+      /* --- 列表渲染与单条目复制 --- */
       function renderTimeline() {
         const b=document.getElementById('schedule-result-area'), d=getActivePage()?.data||[];
         b.innerHTML = d.length ? '' : '<div style="text-align:center;color:#aaa;padding:20px">暂无数据</div>';
         d.forEach((item,i)=>{
           const c=document.createElement('div'); c.className='timeline-card'; c.id=`card-${i}`;
-          // [新增] 复制单个条目按钮 📋
+          // 增加了 复制按钮 (Clipboard Icon)
           c.innerHTML=`
             <div class="t-header">
               <div class="t-time">${item.time}</div>
-              <div style="font-size:20px">${item.icon||''}</div>
+              <div style="font-size:20px">${item.icon||'🗓'}</div>
             </div>
             <div class="t-desc">${item.description}</div>
             ${item.html_snippet||''}
             <div class="card-actions">
               <button class="card-btn edit" onclick="copySingleItem(${i})" title="复制">📋</button>
               <button class="card-btn edit" onclick="editItem(${i})">✏️</button>
-              <button class="card-btn del" onclick="delItem(${i})">️</button>
+              <button class="card-btn del" onclick="delItem(${i})">🗑️</button>
             </div>`;
           b.appendChild(c);
         });
         updateRealTimeStatus();
       }
+
+      function editItem(i) { const d=getActivePage().data, v=prompt("修改:",d[i].description); if(v){d[i].description=v;saveRoles();renderTimeline();} }
+      function delItem(i) { if(confirm("删除?")){getActivePage().data.splice(i,1);saveRoles();renderTimeline();} }
       
-      // [新增] 复制单条目功能
+      // 单条目复制实现
       function copySingleItem(i) {
         const d = getActivePage().data[i];
         if(!d) return;
         const txt = `${d.time} ${d.description}`;
         navigator.clipboard.writeText(txt).then(()=>showToast("已复制: "+txt));
       }
-
-      function editItem(i) { const d=getActivePage().data, v=prompt("修改:",d[i].description); if(v){d[i].description=v;saveRoles();renderTimeline();} }
-      function delItem(i) { if(confirm("删除?")){getActivePage().data.splice(i,1);saveRoles();renderTimeline();} }
 
       function updateRealTimeStatus() {
         const d = getActivePage()?.data || [];
@@ -2041,13 +1748,14 @@
         navigator.clipboard.writeText(txt).then(()=>showToast("已复制上下文")).catch(()=>showToast("失败"));
       }
 
-      // 导入导出 (全量备份)
+      // 全量备份 (包含所有 presets)
       function exportData() { 
         const d={}; 
-        // 遍历所有 keys 确保全量导出 (包含 copy)
         Object.keys(STORAGE_KEYS).forEach(k=>d[k]=localStorage.getItem(STORAGE_KEYS[k])); 
         const b=new Blob([JSON.stringify(d)],{type:'application/json'}); 
-        const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); 
+        const a=document.createElement('a'); 
+        a.href=URL.createObjectURL(b); a.download=`backup_${new Date().toISOString().slice(0,10)}.json`; 
+        a.click(); 
       }
       function importData(i) { 
         const f=i.files[0]; if(!f)return; 
@@ -2055,6 +1763,7 @@
         r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.keys(d).forEach(k=>localStorage.setItem(k,d[k]));alert("导入成功");location.reload();}catch(x){alert("错误")}}; 
         r.readAsText(f); 
       }
+      
     </script>
   </body>
 </html>
