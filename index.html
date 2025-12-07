@@ -570,197 +570,263 @@
       .edge-sensor.right { top: 30px; bottom: 30px; right: 0; width: 15px; }
       /* ★★★★★ 这里是你要复制进去的代码 结束 ★★★★★ */
 /* ===========================
-         V10.0 UI 皮肤：深空灰·磨砂玻璃 (Dark Frost)
-         只针对 #app-settings 和 #app-schedule 生效
+         AI终端 V11.0 终极UI：高级灰半透明版
          =========================== */
       
-      /* 1. 窗口背景：深色磨砂 */
-      #app-settings, #app-schedule {
-        background: rgba(30, 32, 36, 0.92) !important; /* 深灰背景 */
-        backdrop-filter: blur(25px) !important;        /* 强力毛玻璃 */
-        -webkit-backdrop-filter: blur(25px) !important;
-      }
-
-      /* 2. 字体与标题：银白色系 */
-      #app-settings .schedule-header,
-      #app-schedule .schedule-header {
-        color: #eceff1 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        letter-spacing: 1px;
-      }
-      
-      /* 3. 卡片容器：半透明悬浮层 */
-      #app-settings .settings-group, 
-      #app-schedule .page-config-panel {
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
-        margin-bottom: 20px !important;
-        padding: 15px !important;
-      }
-      
-      /* 绑定面板的特殊微调 */
-      #app-schedule .page-config-panel {
-        background: rgba(255, 255, 255, 0.02) !important; /* 更淡一点 */
-      }
-
-      /* 4. 标题文字：取消原来的颜色，改为冷灰色 */
-      .settings-title, .page-config-title {
-        color: #b0bec5 !important;
-        border-color: #546e7a !important; /* 左侧竖线改为蓝灰 */
-        font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 12px;
-      }
-      .page-config-title {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        color: #90a4ae !important;
-      }
-
-      /* 5. 输入框与下拉框：极简深邃风 */
-      .custom-input, .custom-textarea, .preset-select, .page-config-select, #bind-mode {
-        background: rgba(0, 0, 0, 0.3) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #fff !important;
-        border-radius: 8px !important;
-        font-family: monospace;
-        transition: all 0.3s;
-      }
-      .custom-input:focus, .custom-textarea:focus {
-        background: rgba(0, 0, 0, 0.6) !important;
-        border-color: #81d4fa !important; /* 聚焦时亮蓝光 */
-        box-shadow: 0 0 8px rgba(129, 212, 250, 0.2);
-      }
-      .input-label, .page-config-label {
-        color: #78909c !important; /* 标签文字变暗 */
-      }
-
-      /* 6. 按钮升级：科技感 */
-      .btn-primary {
-        background: linear-gradient(135deg, #455a64, #263238) !important;
-        color: #fff !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
-      }
-      .btn-secondary {
-        background: transparent !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: #b0bec5 !important;
-      }
-      .icon-btn, .mini-btn, .var-btn {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: none !important;
-        color: #eceff1 !important;
-        border-radius: 6px !important;
-      }
-      .preset-bar, .prompt-toolbar {
-        background: transparent !important;
-        border: 1px dashed rgba(255, 255, 255, 0.1) !important;
-      }
-
-      /* 7. 时间轴卡片：黑胶唱片质感 */
-      .timeline-card {
-        background: rgba(20, 20, 20, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 12px !important;
-        color: #cfd8dc !important;
-      }
-      .timeline-card .t-time {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #81d4fa !important; /* 时间高亮色 */
-        font-family: 'Courier New', monospace;
-      }
-      .timeline-card .t-desc {
-        color: #b0bec5 !important;
-      }
-      /* 当前活跃卡片：流光金 */
-      .timeline-card.active-now {
-        background: rgba(255, 193, 7, 0.05) !important;
-        border: 1px solid rgba(255, 193, 7, 0.3) !important;
-        box-shadow: 0 0 15px rgba(255, 193, 7, 0.1) !important;
-      }
-
-      /* 8. 角色栏 & 页签 */
-      .role-bar {
-        background: rgba(0,0,0,0.3) !important;
-        border: 1px solid rgba(255,255,255,0.05) !important;
-      }
-      .tab-item {
-        background: rgba(255,255,255,0.03) !important;
-        color: #78909c !important;
-        border: none !important;
-      }
-      .tab-item.active {
-        background: rgba(255,255,255,0.1) !important;
-        color: #fff !important;
-        border-bottom: 2px solid #81d4fa !important; /* 激活时底部蓝条 */
-      }
-
-      /* 9. 实时状态面板 */
-      #realtime-status-panel {
-        background: linear-gradient(to right, #232526, #414345) !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
-      }
-      .rt-content { color: #81d4fa !important; }
-      .rt-divider { border-top: 1px dashed rgba(255,255,255,0.1) !important; }
-
-      /* [关键修复] 悬浮菜单样式 */
-      .fab-action-item {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end; 
-        gap: 12px;
-        cursor: pointer;
-        width: 100%;
-        margin-bottom: 10px;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .fab-action-item:active { transform: scale(0.95); }
-      .fab-item-label {
-        background: #fff;
-        color: #5d4037;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        white-space: nowrap;
-      }
-      .fab-item-icon {
-        width: 48px; height: 48px; border-radius: 50%;
-        background: #fff; display: flex; justify-content: center; align-items: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15); border: 2px solid #fff; overflow: hidden;
-      }
-      .fab-item-icon img { width: 100%; height: 100%; object-fit: cover; }
-      .fab-item-icon svg { width: 24px; height: 24px; fill: #5d4037; }
-      
-      /* 基础容器修正 */
+      /* 1. 基础容器优化 */
       .schedule-container { padding: 60px 20px 120px 20px; height: 100%; overflow-y: auto; box-sizing: border-box; }
+      .schedule-header { 
+          font-size: 20px; color: #eceff1; margin-bottom: 20px; padding-bottom: 15px; 
+          border-bottom: 1px solid rgba(255,255,255,0.1); 
+          font-weight: bold; display: flex; justify-content: space-between; align-items: center; 
+          letter-spacing: 1px;
+      }
+
+      /* 2. 桌面图标 (保持不变) */
       .icon-bg-desktop svg { width: 50%; height: 50%; fill: #eceff1; }
-      
-      /* 悬浮窗修正 */
+      .icon-bg-desktop span { font-size: 28px; }
+
+      /* 3. 智能悬浮窗 (Flow Widget) */
       #flow-widget {
         position: fixed; z-index: 9999; display: none; top: 100px; left: 20px;
         touch-action: none; user-select: none; -webkit-user-select: none; cursor: move;
         opacity: 0; transition: opacity 0.5s;
       }
       #flow-widget.visible { opacity: 1; }
+      
       .flow-card-glass {
-        background: rgba(60, 60, 60, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        border-radius: 20px; padding: 0 16px; height: 40px; display: flex; align-items: center;
-        color: #fff; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; overflow: hidden;
-        white-space: nowrap; transition: width 0.3s;
+        background: rgba(30, 30, 30, 0.85); /* 深灰底色 */
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); /* 强毛玻璃 */
+        border: 1px solid rgba(255, 255, 255, 0.15); /* 细微白边 */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); /* 深度投影 */
+        border-radius: 24px;
+        padding: 0 18px;
+        height: 44px;
+        display: flex; align-items: center;
+        color: #f5f5f5; /* 亮白文字 */
+        font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+        overflow: hidden; white-space: nowrap;
+        transition: width 0.3s;
       }
+      .flow-card-glass:active { transform: scale(0.96); background: rgba(50, 50, 50, 0.95); }
+
+      /* 动画组件 */
       .marquee-container { position: relative; overflow: hidden; white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; pointer-events: none; }
       .marquee-text { position: absolute; white-space: nowrap; will-change: transform; }
       .breathing-content { width: 100%; text-align: center; pointer-events: none; }
-      .flow-icon-pure { display: block; cursor: move; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.2s; }
+      .flow-icon-pure { display: block; cursor: move; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); transition: transform 0.2s; border-radius: 12px; }
+      .flow-icon-pure:active { transform: scale(0.9); }
+
+      /* 4. 核心UI重绘：高级灰半透明面板 */
+      
+      /* 覆盖所有 App 窗口背景为深色 */
+      #app-settings, #app-schedule {
+          background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%) !important;
+          color: #e0e0e0;
+      }
+
+      /* 设置分组卡片 */
+      .settings-group { 
+          margin-bottom: 20px; 
+          background: rgba(255, 255, 255, 0.03); /* 极淡的白色叠加 */
+          padding: 20px; 
+          border-radius: 16px; 
+          border: 1px solid rgba(255, 255, 255, 0.08); 
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      .settings-title { 
+          font-size: 14px; color: #b0bec5; margin-bottom: 15px; font-weight: bold; 
+          border-left: 3px solid #607d8b; padding-left: 10px; 
+          display: flex; justify-content: space-between; align-items: center;
+      }
+
+      /* 输入框行 */
+      .input-row { margin-bottom: 15px; }
+      .input-label { font-size: 12px; color: #78909c; margin-bottom: 6px; display: block; font-weight: 600; }
+      
+      /* 输入控件 (输入框、下拉框、文本域) - 深色玻璃质感 */
+      .custom-input, .custom-textarea, .preset-select, .page-config-select { 
+          width: 100%; padding: 10px 12px; 
+          border: 1px solid rgba(255, 255, 255, 0.15); 
+          border-radius: 8px; 
+          background: rgba(0, 0, 0, 0.3); 
+          font-size: 13px; color: #fff; 
+          box-sizing: border-box; outline: none; transition: 0.3s;
+          font-family: sans-serif;
+      }
+      .custom-input:focus, .custom-textarea:focus, .preset-select:focus { 
+          background: rgba(0, 0, 0, 0.5); 
+          border-color: #90a4ae; 
+          box-shadow: 0 0 0 2px rgba(144, 164, 174, 0.2);
+      }
+      .custom-textarea { resize: vertical; min-height: 80px; font-family: monospace; line-height: 1.5;}
+
+      /* 按钮组 */
+      .btn-row { display: flex; gap: 12px; margin-top: 15px; }
+      .btn-primary { 
+          flex: 1; 
+          background: linear-gradient(135deg, #546e7a 0%, #455a64 100%); 
+          color: #fff; border: none; padding: 12px; border-radius: 10px; 
+          font-weight: bold; cursor: pointer; 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+          transition: 0.2s;
+      }
+      .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+      
+      .btn-secondary { 
+          flex: 1; 
+          background: transparent; 
+          border: 1px solid rgba(255,255,255,0.2); 
+          color: #b0bec5; padding: 12px; border-radius: 10px; 
+          font-weight: bold; cursor: pointer;
+      }
+      .btn-secondary:active { background: rgba(255,255,255,0.05); }
+
+      .icon-btn { 
+          width: 32px; height: 32px; 
+          border: 1px solid rgba(255,255,255,0.1); 
+          background: rgba(255,255,255,0.05); 
+          border-radius: 8px; cursor: pointer; 
+          display: flex; justify-content: center; align-items: center; 
+          color: #ccc; font-size: 14px; padding:0; transition: 0.2s;
+      }
+      .icon-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+      
+      /* 预设栏 */
+      .preset-bar { 
+          display: flex; gap: 10px; margin-bottom: 15px; 
+          background: rgba(0,0,0,0.2); 
+          padding: 10px; border-radius: 10px; 
+          border: 1px dashed rgba(255,255,255,0.1); align-items: center; 
+      }
+      
+      /* 绑定配置面板 (计时器页) */
+      .page-config-panel {
+        background: rgba(255,255,255,0.02); /* 极淡 */
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 25px;
+      }
+      .page-config-title {
+        font-size: 12px; font-weight: bold; color: #90a4ae; margin-bottom: 12px; text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; letter-spacing: 1px;
+      }
+      .page-config-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
+      .page-config-label { width: 80px; color: #cfd8dc; font-weight: 500; flex-shrink: 0; }
+      
+      /* 角色栏 */
+      .role-bar { 
+          display: flex; gap: 10px; margin-bottom: 15px; align-items: center; 
+          background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+      }
+      .mini-btn { 
+          width: 28px; height: 28px; 
+          border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); 
+          border-radius: 6px; display: flex; justify-content: center; align-items: center; 
+          cursor: pointer; color: #aaa; font-size: 12px; 
+      }
+
+      /* 标签页 */
+      .tabs-header { 
+          display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 15px; 
+          border-bottom: 1px solid rgba(255,255,255,0.1); 
+      }
+      .tab-item { 
+          padding: 8px 16px; 
+          background: rgba(255,255,255,0.03); 
+          border: 1px solid rgba(255,255,255,0.05); 
+          border-radius: 8px 8px 0 0; 
+          font-size: 12px; color: #78909c; cursor: pointer; white-space: nowrap; 
+      }
+      .tab-item.active { 
+          background: rgba(255,255,255,0.1); 
+          color: #fff; font-weight: bold; 
+          border-bottom: 2px solid #90a4ae; 
+      }
+      .tab-add-btn { padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; color: #aaa; }
+
+      /* 提示词工具条 */
+      .prompt-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+      .var-btn { 
+          background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+          border-radius: 4px; padding: 4px 8px; font-size: 11px; 
+          color: #b0bec5; cursor: pointer; font-family: monospace; 
+      }
+
+      /* 实时面板 & 卡片 */
+      #realtime-status-panel { 
+          background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.4)); 
+          color: #fff; padding: 20px; border-radius: 16px; margin-bottom: 25px; 
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); 
+      }
+      .rt-content { font-size: 14px; font-weight: 500; color: #e0e0e0; margin: 6px 0; line-height: 1.5; font-family: monospace;}
+      .rt-divider { border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 12px 0; }
+      
+      .timeline-card { 
+          background: rgba(255, 255, 255, 0.03); 
+          border: 1px solid rgba(255, 255, 255, 0.05); 
+          border-radius: 14px; padding: 18px; margin-bottom: 18px; 
+          position: relative; transition: 0.3s; 
+      }
+      .timeline-card.active-now { 
+          border: 1px solid #90a4ae; 
+          background: rgba(144, 164, 174, 0.1); 
+          box-shadow: 0 0 20px rgba(144, 164, 174, 0.1); 
+          transform: scale(1.01); z-index: 2; 
+      }
+      .t-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+      .t-time { 
+          font-family: monospace; font-weight: bold; font-size: 15px; 
+          color: #fff; background: rgba(255,255,255,0.1); 
+          padding: 4px 10px; border-radius: 6px; 
+      }
+      .t-desc { font-size: 14px; color: #bdbdbd; line-height: 1.6; white-space: pre-wrap; }
+      
+      .card-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: flex-end; gap: 8px; }
+      .card-btn { font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; transition: 0.2s;}
+      .card-btn.edit { color: #b0bec5; border-color: rgba(255,255,255,0.1); }
+      .card-btn.copy { color: #fff; background: rgba(255,255,255,0.1); }
+      .card-btn.del { color: #ef9a9a; border-color: rgba(239, 83, 80, 0.2); }
+
+      /* [悬浮菜单统一美化] - 强制正圆形与统一大小 */
+      .fab-action-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; 
+        gap: 15px; /* 增加文字和图标间距 */
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 12px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .fab-action-item:active { transform: scale(0.96); }
+      
+      .fab-item-label {
+        background: rgba(255,255,255,0.95);
+        color: #37474f;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        white-space: nowrap;
+      }
+      
+      .fab-item-icon {
+        width: 50px; 
+        height: 50px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        border: 2px solid #fff;
+        overflow: hidden; /* 确保图片裁切为圆形 */
+      }
+      .fab-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+      .fab-item-icon svg { width: 26px; height: 26px; fill: #455a64; }
 
     </style>
   </head>
@@ -839,12 +905,12 @@
             </div>
           </div>
           
-          <div style="padding:10px; background:rgba(255,255,255,0.1); color:#81d4fa; font-size:12px; border-radius:8px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.1);">
+          <div style="padding:12px; background:rgba(33, 150, 243, 0.1); border:1px solid rgba(33, 150, 243, 0.2); color:#64b5f6; font-size:12px; border-radius:8px; margin-bottom:20px;">
             ℹ️ 说明：这里只负责<b>编辑和保存预设</b>。要让计时器生效，请去“计时”界面，为每个计时器页签<b>绑定</b>对应的预设。
           </div>
 
           <div class="settings-group">
-            <div class="settings-title" style="color:#d84315;">🎈 悬浮窗全局设置</div>
+            <div class="settings-title" style="color:#b39ddb;">🎈 悬浮窗全局设置</div>
             <div class="input-row"><label class="input-label">显示模式</label>
               <select id="flow-mode" class="custom-input" onchange="saveGlobalSettings()">
                 <option value="detail">详细展示 (循环滚动)</option>
@@ -864,7 +930,7 @@
           </div>
 
           <div class="settings-group">
-            <div class="settings-title" style="color:#d84315;">📋 文案/复制预设</div>
+            <div class="settings-title" style="color:#80cbc4;">📋 文案/复制预设</div>
             <div class="preset-bar">
               <select id="copy-preset-select" class="preset-select" onchange="loadPreset('copy', this.value)"><option value="">-- 新建/选择 --</option></select>
               <button class="icon-btn" onclick="savePreset('copy')">💾</button> <button class="icon-btn delete" onclick="deletePreset('copy')">🗑️</button>
@@ -883,7 +949,7 @@
           </div>
 
           <div class="settings-group">
-            <div class="settings-title">📡 API 预设</div>
+            <div class="settings-title" style="color:#90caf9;">📡 API 预设</div>
             <div class="preset-bar">
               <select id="api-preset-select" class="preset-select" onchange="loadPreset('api', this.value)"><option value="">-- 新建/选择 --</option></select>
               <button class="icon-btn" onclick="savePreset('api')">💾</button> <button class="icon-btn delete" onclick="deletePreset('api')">🗑️</button>
@@ -945,14 +1011,14 @@
         <div class="schedule-container">
           <div class="role-bar">
             <span>🎭</span>
-            <select id="role-select" class="custom-input" style="padding:4px; font-weight:bold;" onchange="switchRole(this.value)"></select>
+            <select id="role-select" class="custom-input" style="padding:6px; font-weight:bold; background:rgba(0,0,0,0.2);" onchange="switchRole(this.value)"></select>
             <button class="mini-btn" onclick="addNewRole()">+</button>
             <button class="mini-btn" onclick="renameRole()">✎</button>
-            <button class="mini-btn" onclick="deleteRole()" style="color:#e57373;">🗑️</button>
+            <button class="mini-btn" onclick="deleteRole()" style="color:#ef9a9a;">🗑️</button>
           </div>
           
           <div class="tabs-header" id="timer-tabs"></div>
-          <div style="text-align:right; margin-bottom:10px;">
+          <div style="text-align:right; margin-bottom:15px;">
              <button class="card-btn del" onclick="deleteCurrentPage()">🗑️ 删除页签</button>
              <button class="card-btn del" onclick="clearCurrentPage()">🧹 清空内容</button>
           </div>
@@ -981,7 +1047,7 @@
              </div>
              <div class="page-config-row">
                <div class="page-config-label">👀 显示范围:</div>
-               <select id="bind-mode" class="page-config-select" style="border-color:#81d4fa; color:#81d4fa; font-weight:bold;" onchange="updatePageBinding('exportMode', this.value)">
+               <select id="bind-mode" class="page-config-select" style="border:1px solid #ffcc80; color:#ffcc80;" onchange="updatePageBinding('exportMode', this.value)">
                  <option value="both">未来 + 过去 (双向)</option>
                  <option value="future">只显示未来</option>
                  <option value="past">只显示过去</option>
@@ -990,9 +1056,9 @@
           </div>
 
           <div id="realtime-status-panel">
-            <div class="rt-content" id="rt-past">--</div>
+            <div class="rt-content" id="rt-past" style="color:#bcaaa4;">--</div>
             <div class="rt-divider"></div>
-            <div class="rt-content" id="rt-future">--</div>
+            <div class="rt-content" id="rt-future" style="color:#80cbc4;">--</div>
           </div>
 
           <div style="margin-bottom:20px;">
@@ -1000,7 +1066,7 @@
                <button class="btn-primary" id="btn-gen-schedule" onclick="generateSchedule(false)">🔄 重新生成</button>
                <button class="btn-secondary" id="btn-append-schedule" onclick="generateSchedule(true)">➕ 追加生成</button>
              </div>
-             <div id="schedule-loading" style="display:none; padding:10px; text-align:center; font-size:12px; color:#8d6e63;">🧠 正在根据绑定配置构思...</div>
+             <div id="schedule-loading" style="display:none; padding:15px; text-align:center; font-size:12px; color:#b0bec5;">🧠 正在根据绑定配置构思...</div>
           </div>
           <div id="schedule-result-area"></div>
           <div style="height:100px;"></div>
@@ -1659,7 +1725,6 @@
             const pageKey = type + 'Preset'; 
             bindSelect.value = getActivePage()[pageKey] || "";
         }
-        // 特殊处理：exportMode
         const modeSelect = document.getElementById('bind-mode');
         if(modeSelect && getActivePage()) {
             modeSelect.value = getActivePage().exportMode || 'both';
@@ -1783,7 +1848,6 @@
             const charCfg = getPresets('char')[page.charPreset];
             if(charCfg && charCfg['char-name']) charName = charCfg['char-name'];
         } else {
-            // 如果没绑定预设，尝试直接读取当前角色名
             const role = roles.find(r=>r.id==activeRoleId);
             if(role) charName = role.name;
         }
