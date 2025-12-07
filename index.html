@@ -570,7 +570,7 @@
       .edge-sensor.right { top: 30px; bottom: 30px; right: 0; width: 15px; }
       /* ★★★★★ 这里是你要复制进去的代码 结束 ★★★★★ */
 /* ===========================
-         AI终端 V11.0 终极UI：高级灰半透明版
+         AI终端 V12.0 终极UI：高级灰半透明版
          =========================== */
       
       /* 1. 基础容器优化 */
@@ -582,7 +582,7 @@
           letter-spacing: 1px;
       }
 
-      /* 2. 桌面图标 (保持不变) */
+      /* 2. 桌面图标 */
       .icon-bg-desktop svg { width: 50%; height: 50%; fill: #eceff1; }
       .icon-bg-desktop span { font-size: 28px; }
 
@@ -595,15 +595,15 @@
       #flow-widget.visible { opacity: 1; }
       
       .flow-card-glass {
-        background: rgba(30, 30, 30, 0.85); /* 深灰底色 */
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); /* 强毛玻璃 */
-        border: 1px solid rgba(255, 255, 255, 0.15); /* 细微白边 */
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); /* 深度投影 */
+        background: rgba(30, 30, 30, 0.85);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         border-radius: 24px;
         padding: 0 18px;
         height: 44px;
         display: flex; align-items: center;
-        color: #f5f5f5; /* 亮白文字 */
+        color: #f5f5f5;
         font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
         overflow: hidden; white-space: nowrap;
         transition: width 0.3s;
@@ -618,8 +618,6 @@
       .flow-icon-pure:active { transform: scale(0.9); }
 
       /* 4. 核心UI重绘：高级灰半透明面板 */
-      
-      /* 覆盖所有 App 窗口背景为深色 */
       #app-settings, #app-schedule {
           background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%) !important;
           color: #e0e0e0;
@@ -627,11 +625,8 @@
 
       /* 设置分组卡片 */
       .settings-group { 
-          margin-bottom: 20px; 
-          background: rgba(255, 255, 255, 0.03); /* 极淡的白色叠加 */
-          padding: 20px; 
-          border-radius: 16px; 
-          border: 1px solid rgba(255, 255, 255, 0.08); 
+          margin-bottom: 20px; background: rgba(255, 255, 255, 0.03); padding: 20px; 
+          border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); 
           box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       }
       .settings-title { 
@@ -640,73 +635,49 @@
           display: flex; justify-content: space-between; align-items: center;
       }
 
-      /* 输入框行 */
+      /* 输入控件 */
       .input-row { margin-bottom: 15px; }
       .input-label { font-size: 12px; color: #78909c; margin-bottom: 6px; display: block; font-weight: 600; }
-      
-      /* 输入控件 (输入框、下拉框、文本域) - 深色玻璃质感 */
       .custom-input, .custom-textarea, .preset-select, .page-config-select { 
           width: 100%; padding: 10px 12px; 
-          border: 1px solid rgba(255, 255, 255, 0.15); 
-          border-radius: 8px; 
-          background: rgba(0, 0, 0, 0.3); 
-          font-size: 13px; color: #fff; 
-          box-sizing: border-box; outline: none; transition: 0.3s;
-          font-family: sans-serif;
+          border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; 
+          background: rgba(0, 0, 0, 0.3); font-size: 13px; color: #fff; 
+          box-sizing: border-box; outline: none; transition: 0.3s; font-family: sans-serif;
       }
-      .custom-input:focus, .custom-textarea:focus, .preset-select:focus { 
-          background: rgba(0, 0, 0, 0.5); 
-          border-color: #90a4ae; 
-          box-shadow: 0 0 0 2px rgba(144, 164, 174, 0.2);
+      .custom-input:focus, .custom-textarea:focus, .preset-select:focus, .page-config-select:focus { 
+          background: rgba(0, 0, 0, 0.5); border-color: #90a4ae; box-shadow: 0 0 0 2px rgba(144, 164, 174, 0.2);
       }
       .custom-textarea { resize: vertical; min-height: 80px; font-family: monospace; line-height: 1.5;}
 
       /* 按钮组 */
       .btn-row { display: flex; gap: 12px; margin-top: 15px; }
       .btn-primary { 
-          flex: 1; 
-          background: linear-gradient(135deg, #546e7a 0%, #455a64 100%); 
+          flex: 1; background: linear-gradient(135deg, #546e7a 0%, #455a64 100%); 
           color: #fff; border: none; padding: 12px; border-radius: 10px; 
-          font-weight: bold; cursor: pointer; 
-          box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
-          transition: 0.2s;
+          font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s;
       }
       .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-      
       .btn-secondary { 
-          flex: 1; 
-          background: transparent; 
-          border: 1px solid rgba(255,255,255,0.2); 
-          color: #b0bec5; padding: 12px; border-radius: 10px; 
-          font-weight: bold; cursor: pointer;
+          flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.2); 
+          color: #b0bec5; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;
       }
       .btn-secondary:active { background: rgba(255,255,255,0.05); }
-
       .icon-btn { 
-          width: 32px; height: 32px; 
-          border: 1px solid rgba(255,255,255,0.1); 
-          background: rgba(255,255,255,0.05); 
-          border-radius: 8px; cursor: pointer; 
-          display: flex; justify-content: center; align-items: center; 
-          color: #ccc; font-size: 14px; padding:0; transition: 0.2s;
+          width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.1); 
+          background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; 
+          display: flex; justify-content: center; align-items: center; color: #ccc; font-size: 14px; padding:0; transition: 0.2s;
       }
       .icon-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
       
-      /* 预设栏 */
       .preset-bar { 
-          display: flex; gap: 10px; margin-bottom: 15px; 
-          background: rgba(0,0,0,0.2); 
-          padding: 10px; border-radius: 10px; 
-          border: 1px dashed rgba(255,255,255,0.1); align-items: center; 
+          display: flex; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.2); 
+          padding: 10px; border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); align-items: center; 
       }
       
-      /* 绑定配置面板 (计时器页) */
+      /* 绑定配置面板 */
       .page-config-panel {
-        background: rgba(255,255,255,0.02); /* 极淡 */
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 16px;
-        padding: 15px;
-        margin-bottom: 25px;
+        background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px; padding: 15px; margin-bottom: 25px;
       }
       .page-config-title {
         font-size: 12px; font-weight: bold; color: #90a4ae; margin-bottom: 12px; text-align: center;
@@ -715,46 +686,31 @@
       .page-config-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
       .page-config-label { width: 80px; color: #cfd8dc; font-weight: 500; flex-shrink: 0; }
       
-      /* 角色栏 */
+      /* 其他组件 */
       .role-bar { 
           display: flex; gap: 10px; margin-bottom: 15px; align-items: center; 
           background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
       }
       .mini-btn { 
-          width: 28px; height: 28px; 
-          border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); 
-          border-radius: 6px; display: flex; justify-content: center; align-items: center; 
-          cursor: pointer; color: #aaa; font-size: 12px; 
+          width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.1); 
+          background: rgba(255,255,255,0.05); border-radius: 6px; 
+          display: flex; justify-content: center; align-items: center; cursor: pointer; color: #aaa; font-size: 12px; 
       }
-
-      /* 标签页 */
       .tabs-header { 
           display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 15px; 
           border-bottom: 1px solid rgba(255,255,255,0.1); 
       }
       .tab-item { 
-          padding: 8px 16px; 
-          background: rgba(255,255,255,0.03); 
-          border: 1px solid rgba(255,255,255,0.05); 
-          border-radius: 8px 8px 0 0; 
-          font-size: 12px; color: #78909c; cursor: pointer; white-space: nowrap; 
+          padding: 8px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+          border-radius: 8px 8px 0 0; font-size: 12px; color: #78909c; cursor: pointer; white-space: nowrap; 
       }
-      .tab-item.active { 
-          background: rgba(255,255,255,0.1); 
-          color: #fff; font-weight: bold; 
-          border-bottom: 2px solid #90a4ae; 
-      }
+      .tab-item.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: bold; border-bottom: 2px solid #90a4ae; }
       .tab-add-btn { padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; color: #aaa; }
-
-      /* 提示词工具条 */
       .prompt-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px; }
       .var-btn { 
           background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-          border-radius: 4px; padding: 4px 8px; font-size: 11px; 
-          color: #b0bec5; cursor: pointer; font-family: monospace; 
+          border-radius: 4px; padding: 4px 8px; font-size: 11px; color: #b0bec5; cursor: pointer; font-family: monospace; 
       }
-
-      /* 实时面板 & 卡片 */
       #realtime-status-panel { 
           background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.4)); 
           color: #fff; padding: 20px; border-radius: 16px; margin-bottom: 25px; 
@@ -762,68 +718,40 @@
       }
       .rt-content { font-size: 14px; font-weight: 500; color: #e0e0e0; margin: 6px 0; line-height: 1.5; font-family: monospace;}
       .rt-divider { border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 12px 0; }
-      
       .timeline-card { 
-          background: rgba(255, 255, 255, 0.03); 
-          border: 1px solid rgba(255, 255, 255, 0.05); 
-          border-radius: 14px; padding: 18px; margin-bottom: 18px; 
-          position: relative; transition: 0.3s; 
+          background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); 
+          border-radius: 14px; padding: 18px; margin-bottom: 18px; position: relative; transition: 0.3s; 
       }
       .timeline-card.active-now { 
-          border: 1px solid #90a4ae; 
-          background: rgba(144, 164, 174, 0.1); 
-          box-shadow: 0 0 20px rgba(144, 164, 174, 0.1); 
-          transform: scale(1.01); z-index: 2; 
+          border: 1px solid #90a4ae; background: rgba(144, 164, 174, 0.1); 
+          box-shadow: 0 0 20px rgba(144, 164, 174, 0.1); transform: scale(1.01); z-index: 2; 
       }
       .t-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
       .t-time { 
           font-family: monospace; font-weight: bold; font-size: 15px; 
-          color: #fff; background: rgba(255,255,255,0.1); 
-          padding: 4px 10px; border-radius: 6px; 
+          color: #fff; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; 
       }
       .t-desc { font-size: 14px; color: #bdbdbd; line-height: 1.6; white-space: pre-wrap; }
-      
       .card-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: flex-end; gap: 8px; }
       .card-btn { font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; transition: 0.2s;}
       .card-btn.edit { color: #b0bec5; border-color: rgba(255,255,255,0.1); }
       .card-btn.copy { color: #fff; background: rgba(255,255,255,0.1); }
       .card-btn.del { color: #ef9a9a; border-color: rgba(239, 83, 80, 0.2); }
 
-      /* [悬浮菜单统一美化] - 强制正圆形与统一大小 */
+      /* [悬浮菜单统一美化] */
       .fab-action-item {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end; 
-        gap: 15px; /* 增加文字和图标间距 */
-        cursor: pointer;
-        width: 100%;
-        margin-bottom: 12px;
-        -webkit-tap-highlight-color: transparent;
+        display: flex; align-items: center; justify-content: flex-end; 
+        gap: 15px; cursor: pointer; width: 100%; margin-bottom: 12px; -webkit-tap-highlight-color: transparent;
       }
       .fab-action-item:active { transform: scale(0.96); }
-      
       .fab-item-label {
-        background: rgba(255,255,255,0.95);
-        color: #37474f;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        white-space: nowrap;
+        background: rgba(255,255,255,0.95); color: #37474f; padding: 6px 14px; border-radius: 8px;
+        font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1); white-space: nowrap;
       }
-      
       .fab-item-icon {
-        width: 50px; 
-        height: 50px;
-        border-radius: 50%;
-        background: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        border: 2px solid #fff;
-        overflow: hidden; /* 确保图片裁切为圆形 */
+        width: 50px; height: 50px; border-radius: 50%; background: #fff;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2); border: 2px solid #fff; overflow: hidden;
       }
       .fab-item-icon img { width: 100%; height: 100%; object-fit: cover; }
       .fab-item-icon svg { width: 26px; height: 26px; fill: #455a64; }
@@ -906,7 +834,7 @@
           </div>
           
           <div style="padding:12px; background:rgba(33, 150, 243, 0.1); border:1px solid rgba(33, 150, 243, 0.2); color:#64b5f6; font-size:12px; border-radius:8px; margin-bottom:20px;">
-            ℹ️ 说明：这里只负责<b>编辑和保存预设</b>。要让计时器生效，请去“计时”界面，为每个计时器页签<b>绑定</b>对应的预设。
+            ℹ️ 说明：这里负责<b>编辑和保存预设</b>。要让计时器生效，请去“计时”界面，为每个计时器页签<b>绑定</b>对应的预设。
           </div>
 
           <div class="settings-group">
@@ -1401,16 +1329,15 @@
           navigator.serviceWorker.register('sw.js');
         });
       }
-/* ===========================
-         V11.0 逻辑核心 (最终完整版)
-         特性：全量备份修复 / 精准抓取 / 独立复制 / 新UI支持
+      /* ===========================
+         V12.0 逻辑核心 (自动存档/修复版)
+         特性：自动默认值 / 持久化选项 / 完善备份
          =========================== */
       let timerPages = [];
       let activeRoleId = 0; 
       let activePageIndex = 0;
       let roles = [];
       
-      // 默认设置值
       let globalSettings = {
         flowMode: 'simple', 
         flowRange: 15,
@@ -1426,17 +1353,7 @@
 
       const DEFAULT_GLOBAL_TEMPLATE = "此条内容是ai写作指导，角色不可见。以下是角色原本的日程计划，注意角色可能之前之后都不按照原计划进行，请你根据上下文语境进行判断剧情发展：\n${timercontent}\n必须根据上下文判断角色是否之前或之后进行原计划，以及根据当前对话场景角色是否会提及此事，角色也可能已经忘记此事或直接根本不提。你作为ai必须自行判断做出有活人感的反应与结果。";
 
-      // 定义所有需要备份的存储键值 (只处理这些，不影响其他App)
-      const STORAGE_KEYS = { 
-          api: 'tuki_presets_api', 
-          char: 'tuki_presets_char', 
-          user: 'tuki_presets_user', 
-          prompt: 'tuki_presets_prompt', 
-          copy: 'tuki_presets_copy', 
-          roles: 'tuki_roles_v1', // 包含所有计时器设置和内容
-          global: 'tuki_global_settings' // 包含悬浮窗设置
-      };
-
+      const STORAGE_KEYS = { api:'tuki_presets_api', char:'tuki_presets_char', user:'tuki_presets_user', prompt:'tuki_presets_prompt', copy:'tuki_presets_copy', roles:'tuki_roles_v1', global:'tuki_global_settings' };
       const FIELD_MAP = { 
         api:['api-preset-name','api-host','api-key','model-name'], 
         char:['char-preset-name','char-name','char-persona','world-info','chat-history'], 
@@ -1444,16 +1361,18 @@
         prompt:['prompt-preset-name','prompt-content'],
         copy:['copy-preset-name','global-copy-template','status-tpl-past','status-tpl-future'] 
       };
-      
       const DEFAULT_PROMPT = `# 角色扮演任务\n请根据"\${chat.name}"的人设，推演接下来24小时的行为轨迹。\n# 参数\n角色：\${chat.name}\n人设：\${chat.settings.aiPersona}\n# 输出规则\n1. 返回JSON数组。2. 时间格式 "HH:mm"。3. 包含 'html_snippet' (可选)。\n[{"time":"08:00","description":"...","icon":"⏰"}]`;
 
       window.addEventListener('load', () => {
+        // [修复] 确保有默认预设，防止下拉框为空
+        ensureDefaultPresets();
+
+        // 初始化所有下拉框
         ['api','char','user','prompt','copy'].forEach(refreshDropdown);
         
         const savedGlobal = localStorage.getItem(STORAGE_KEYS.global);
         if(savedGlobal) globalSettings = {...globalSettings, ...JSON.parse(savedGlobal)};
         
-        // 恢复设置页UI
         const safeVal = (id, val) => { const el=document.getElementById(id); if(el) el.value=val; };
         safeVal('global-copy-template', DEFAULT_GLOBAL_TEMPLATE);
         safeVal('flow-mode', globalSettings.flowMode);
@@ -1468,30 +1387,10 @@
         const widget = document.getElementById('flow-widget');
         if(widget) { widget.style.left = globalSettings.widgetX + 'px'; widget.style.top = globalSettings.widgetY + 'px'; }
 
-        // 加载角色数据
         const savedRoles = localStorage.getItem(STORAGE_KEYS.roles);
         if(savedRoles) roles = JSON.parse(savedRoles);
         else roles = [{ id: Date.now(), name: "默认角色", pages: [{ id: Date.now(), name: "主日程", data: [], exportMode: "both" }] }];
         activeRoleId = roles[0].id;
-
-        // 初始化默认预设
-        const prompts = getPresets('prompt');
-        if(Object.keys(prompts).length===0) {
-          prompts["默认日程"] = { "prompt-preset-name": "默认日程", "prompt-content": DEFAULT_PROMPT };
-          localStorage.setItem(STORAGE_KEYS.prompt, JSON.stringify(prompts));
-          refreshDropdown('prompt');
-        }
-        const copies = getPresets('copy');
-        if(Object.keys(copies).length===0) {
-           copies["系统默认"] = {
-              "copy-preset-name": "系统默认",
-              "global-copy-template": DEFAULT_GLOBAL_TEMPLATE,
-              "status-tpl-past": "${min}分钟前，${char}原计划是${act}",
-              "status-tpl-future": "${min}分钟后，${char}原计划是${act}"
-           };
-           localStorage.setItem(STORAGE_KEYS.copy, JSON.stringify(copies));
-           refreshDropdown('copy');
-        }
 
         renderRoleUI();
         updateFlowWindowVisibility();
@@ -1499,6 +1398,23 @@
         initFlowLoop();
         initWidgetDrag();
       });
+
+      // [核心修复] 自动创建默认预设，避免“每次都要保存”的问题
+      function ensureDefaultPresets() {
+          const defaults = {
+              api: { "默认API": { "api-preset-name": "默认API", "api-host": "https://api.openai.com", "api-key": "", "model-name": "gpt-3.5-turbo" } },
+              char: { "默认角色": { "char-preset-name": "默认角色", "char-name": "助手", "char-persona": "你是一个助手", "world-info": "", "chat-history": "" } },
+              user: { "默认用户": { "user-preset-name": "默认用户", "user-name": "用户", "user-persona": "" } },
+              prompt: { "默认日程": { "prompt-preset-name": "默认日程", "prompt-content": DEFAULT_PROMPT } },
+              copy: { "系统默认": { "copy-preset-name": "系统默认", "global-copy-template": DEFAULT_GLOBAL_TEMPLATE, "status-tpl-past": "${min}分钟前，${char}原计划是${act}", "status-tpl-future": "${min}分钟后，${char}原计划是${act}" } }
+          };
+          
+          Object.keys(defaults).forEach(type => {
+              if(!localStorage.getItem(STORAGE_KEYS[type])) {
+                  localStorage.setItem(STORAGE_KEYS[type], JSON.stringify(defaults[type]));
+              }
+          });
+      }
 
       function toggleFlowWindow() {
         globalSettings.flowVisible = !globalSettings.flowVisible;
@@ -1527,7 +1443,6 @@
           if(globalSettings.flowVisible) renderNextFlowItem();
       }
 
-      // --- 精准抓取逻辑 ---
       function getFlowQueue() {
           const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
           let queue = [];
@@ -1725,6 +1640,7 @@
       function getPresets(type) { return JSON.parse(localStorage.getItem(STORAGE_KEYS[type])) || {}; }
       
       function refreshDropdown(type) {
+        // 刷新设置页下拉框
         const select = document.getElementById(`${type}-preset-select`);
         const presets = getPresets(type); 
         if(select) {
@@ -1733,6 +1649,8 @@
             Object.keys(presets).forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.innerText=n; select.appendChild(opt); });
             if(presets[cur]) select.value = cur;
         }
+        
+        // 刷新绑定面板下拉框
         const bindSelect = document.getElementById(`bind-${type}`);
         if(bindSelect && getActivePage()) {
             bindSelect.innerHTML = '<option value="">-- 未绑定 --</option>';
@@ -1740,6 +1658,8 @@
             const pageKey = type + 'Preset'; 
             bindSelect.value = getActivePage()[pageKey] || "";
         }
+        
+        // [修复] 确保显示范围下拉框状态正确
         const modeSelect = document.getElementById('bind-mode');
         if(modeSelect && getActivePage()) {
             modeSelect.value = getActivePage().exportMode || 'both';
@@ -1787,11 +1707,18 @@
         c.innerHTML=''; const role = getActiveRole(); if(!role) return;
         role.pages.forEach((p,i)=>{const t=document.createElement('div');t.className=`tab-item ${i===activePageIndex?'active':''}`;t.innerText=p.name;t.onclick=()=>{activePageIndex=i;renderTabs()};c.appendChild(t)});
         const b=document.createElement('div');b.className='tab-add-btn';b.innerText='+';b.onclick=addNewPage;c.appendChild(b);
+        
+        // [核心修复] 每次切换标签页时，重新填充绑定下拉框并设置正确的值
         const cp=getActivePage(); 
         if(cp){ 
             ['api','char','user','prompt','copy'].forEach(type => {
                 const sel = document.getElementById(`bind-${type}`);
-                if(sel) sel.value = cp[type+'Preset'] || "";
+                if(sel) {
+                    // 确保选项存在
+                    refreshDropdown(type);
+                    // 恢复选中状态
+                    sel.value = cp[type+'Preset'] || "";
+                }
             });
             const ms = document.getElementById('bind-mode');
             if(ms) ms.value = cp.exportMode || 'both';
@@ -1802,6 +1729,7 @@
       function deleteCurrentPage() { if(getActiveRole().pages.length<=1)return; if(confirm("删除页签?")){getActiveRole().pages.splice(activePageIndex,1);activePageIndex=0;saveRoles();renderTabs();} }
       function clearCurrentPage() { if(confirm("清空数据?")){getActivePage().data=[];saveRoles();renderTimeline();} }
       
+      // 更新绑定时自动保存到Local Storage
       function updatePageBinding(key, value) {
           const page = getActivePage();
           if(page) { page[key] = value; saveRoles(); showToast("绑定已更新"); }
@@ -1852,10 +1780,9 @@
       function editItem(i) { const d=getActivePage().data, v=prompt("修改:",d[i].description); if(v){d[i].description=v;saveRoles();renderTimeline();} }
       function delItem(i) { if(confirm("删除?")){getActivePage().data.splice(i,1);saveRoles();renderTimeline();} }
       
-      // 独立的手动复制逻辑
       function copySingleItem(i) {
-        const page = getActivePage(); 
-        const item = page.data[i];
+        const page = getActivePage(); const item = page.data[i];
+        
         let charName = "TA";
         if(page.charPreset) {
             const charCfg = getPresets('char')[page.charPreset];
@@ -1864,6 +1791,7 @@
             const role = roles.find(r=>r.id==activeRoleId);
             if(role) charName = role.name;
         }
+
         const txt = `${charName}在${item.time}${item.description}`;
         navigator.clipboard.writeText(txt).then(()=>showToast("已复制: " + txt)).catch(()=>showToast("复制失败"));
       }
@@ -1882,52 +1810,26 @@
         if(nidx < d.length) { const it=d[nidx], [h,m]=it.time.split(':').map(Number); const diff = (h*60+m)-curM; rtFuture.innerText = `即将开始(${diff}m后): ${it.description}`; } else { rtFuture.innerText = "无后续事件"; }
       }
       
-      /* --- [备份与恢复] (核心逻辑) --- */
+      // [核心修复] 全量备份：只导出本功能相关的 tuki_ 键值，并且修改了文件名
       function exportData() { 
-          // 1. 强制保存内存状态到 LocalStorage，确保最新数据被导出
-          try { 
-             const el = id => document.getElementById(id).value; 
-             if(document.getElementById('flow-width')) globalSettings.flowWidth = parseInt(el('flow-width')); 
-             
-             localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings)); 
-             localStorage.setItem(STORAGE_KEYS.roles, JSON.stringify(roles)); // 确保最新的角色/计时器内容被保存
-          } catch(e) { console.error("Auto-save before export failed", e); }
-
-          // 2. 收集所有数据 (只收集本应用定义的 Keys)
-          const d={}; 
-          Object.keys(STORAGE_KEYS).forEach(k => {
-              const storageKey = STORAGE_KEYS[k];
-              const value = localStorage.getItem(storageKey);
-              if(value) d[storageKey] = value;
-          }); 
+          try { const el = id => document.getElementById(id).value; globalSettings.flowWidth = parseInt(el('flow-width')); localStorage.setItem(STORAGE_KEYS.global, JSON.stringify(globalSettings)); } catch(e){}
           
-          // 3. 生成并下载文件
-          const b = new Blob([JSON.stringify(d)], {type:'application/json'}); 
-          const a = document.createElement('a'); 
-          a.href = URL.createObjectURL(b); 
-          a.download = `计时器备份-${new Date().toISOString().slice(0,10)}.json`; // 文件名格式
+          const d={}; 
+          // 只导出 STORAGE_KEYS 定义的键，保证不污染其他数据
+          Object.keys(STORAGE_KEYS).forEach(k=>d[k]=localStorage.getItem(STORAGE_KEYS[k])); 
+          
+          const b=new Blob([JSON.stringify(d)],{type:'application/json'}); 
+          const a=document.createElement('a'); 
+          a.href=URL.createObjectURL(b); 
+          // 修正文件名
+          const dateStr = new Date().toISOString().slice(0,10);
+          a.download=`计时器备份-${dateStr}.json`; 
           a.click(); 
       }
       
       function importData(i) { 
-          const f=i.files[0]; if(!f)return; 
-          const r=new FileReader(); 
-          r.onload=e=>{ 
-              try { 
-                  const d=JSON.parse(e.target.result); 
-                  // 4. 恢复数据 (只恢复本应用的前缀 key)
-                  Object.keys(d).forEach(k => {
-                      if(Object.values(STORAGE_KEYS).includes(k)) {
-                          localStorage.setItem(k, d[k]);
-                      }
-                  }); 
-                  alert("备份导入成功！页面将刷新..."); 
-                  location.reload(); 
-              } catch(x) { 
-                  alert("导入失败：文件格式不正确"); 
-              } 
-          }; 
-          r.readAsText(f); 
+          const f=i.files[0]; if(!f)return; const r=new FileReader(); 
+          r.onload=e=>{ try{ const d=JSON.parse(e.target.result); Object.keys(d).forEach(k=>localStorage.setItem(k,d[k])); alert("导入成功！"); location.reload(); }catch(x){alert("格式错误")} }; r.readAsText(f); 
       }
     </script>
   </body>
