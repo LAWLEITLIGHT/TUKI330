@@ -569,10 +569,9 @@
       /* 右侧感应条 */
       .edge-sensor.right { top: 30px; bottom: 30px; right: 0; width: 15px; }
       /* ★★★★★ 这里是你要复制进去的代码 结束 ★★★★★ */
-
 /* ===========================
-         AI终端 V9.0 修正版样式
-         (修复UI对齐 / 增强显示逻辑)
+         AI终端 V10.0 最终形态样式
+         (修复UI对齐 / 增强显示逻辑 / 新图标适配)
          =========================== */
       
       /* 1. 基础容器优化 */
@@ -673,7 +672,7 @@
       .card-btn.copy { color: #fff; background: #8d6e63; border-color: #5d4037; }
       .card-btn.del { color: #e57373; border-color: #ffcdd2; }
 
-      /* --- [修复] 悬浮菜单统一美化 --- */
+      /* --- [悬浮菜单统一美化] --- */
       .fab-action-item {
         display: flex;
         align-items: center;
@@ -709,8 +708,10 @@
         border: 2px solid #fff;
         overflow: hidden;
       }
+      /* 图片填满，不留白边，像应用图标 */
       .fab-item-icon img { width: 100%; height: 100%; object-fit: cover; }
       .fab-item-icon svg { width: 24px; height: 24px; fill: #5d4037; }
+
     </style>
   </head>
   <body>
@@ -975,21 +976,23 @@
 
           <div class="fab-action-item" onclick="openApp('app-settings')">
             <span class="fab-item-label">配置</span>
-            <div class="fab-item-icon" style="background: #455a64;">
-              <svg viewBox="0 0 24 24" style="fill:#eceff1;"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <div class="fab-item-icon">
+              <img src="https://i.postimg.cc/MZ7rZWzF/18.png" alt="配置" />
             </div>
           </div>
                     
           <div class="fab-action-item" onclick="openApp('app-schedule')">
             <span class="fab-item-label">计时</span>
-            <div class="fab-item-icon" style="background: #e6ceac;">
-              <span style="font-size:20px;">📅</span>
+            <div class="fab-item-icon">
+              <img src="https://i.postimg.cc/prJ0sB08/21.png" alt="计时" />
             </div>
           </div>
           
           <div class="fab-action-item" onclick="toggleFlowWindow()">
-            <span class="fab-item-label">悬浮窗开关</span>
-            <div class="fab-item-icon" style="background:#b3e5fc;"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
+            <span class="fab-item-label">悬窗</span>
+            <div class="fab-item-icon">
+              <img src="https://i.postimg.cc/3rXbrK3S/24.png" alt="悬窗" />
+            </div>
           </div>
           
           <div class="fab-action-item" onclick="hideFab()">
@@ -1283,8 +1286,8 @@
         });
       }
       /* ===========================
-         V9.0 逻辑核心 (精准抓取版)
-         修复：最近事件逻辑 / 找回显示模式 / 悬浮窗UI
+         V10.0 逻辑核心 (最终修正版)
+         特性：精准抓取 / 独立复制逻辑 / 新UI支持
          =========================== */
       let timerPages = [];
       let activeRoleId = 0; 
@@ -1393,7 +1396,7 @@
           if(globalSettings.flowVisible) renderNextFlowItem();
       }
 
-      // --- [核心修正] 精准抓取最近的一组数据 ---
+      // --- 精准抓取逻辑 ---
       function getFlowQueue() {
           const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
           let queue = [];
@@ -1410,7 +1413,6 @@
                       if(charCfg && charCfg['char-name']) charName = charCfg['char-name'];
                   }
 
-                  // 1. 筛选出所有在时间范围内的事件
                   let candidates = [];
                   page.data.forEach(item => {
                       const [h,m] = item.time.split(':').map(Number);
@@ -1423,23 +1425,19 @@
 
                   if(candidates.length === 0) return;
 
-                  // 2. 根据 exportMode (显示范围) 抓取最近的事件
-                  const mode = page.exportMode || 'both'; // 默认为双向
+                  const mode = page.exportMode || 'both';
                   let itemsToAdd = [];
 
-                  // 寻找最近的过去事件
                   if(mode === 'both' || mode === 'past') {
-                      const pastItems = candidates.filter(i => curM >= i.t).sort((a,b) => a.diff - b.diff); // diff越小越近
-                      if(pastItems.length > 0) itemsToAdd.push(pastItems[0]); // 取最近的一个
+                      const pastItems = candidates.filter(i => curM >= i.t).sort((a,b) => a.diff - b.diff);
+                      if(pastItems.length > 0) itemsToAdd.push(pastItems[0]); 
                   }
 
-                  // 寻找最近的未来事件
                   if(mode === 'both' || mode === 'future') {
                       const futureItems = candidates.filter(i => curM < i.t).sort((a,b) => a.diff - b.diff);
-                      if(futureItems.length > 0) itemsToAdd.push(futureItems[0]); // 取最近的一个
+                      if(futureItems.length > 0) itemsToAdd.push(futureItems[0]); 
                   }
 
-                  // 3. 生成展示内容
                   itemsToAdd.forEach(item => {
                       const isPast = curM >= item.t;
                       const tpl = isPast ? copyCfg['status-tpl-past'] : copyCfg['status-tpl-future'];
@@ -1724,18 +1722,26 @@
       function editItem(i) { const d=getActivePage().data, v=prompt("修改:",d[i].description); if(v){d[i].description=v;saveRoles();renderTimeline();} }
       function delItem(i) { if(confirm("删除?")){getActivePage().data.splice(i,1);saveRoles();renderTimeline();} }
       
+      // --- [核心修正] 独立的手动复制逻辑 ---
       function copySingleItem(i) {
-        const page = getActivePage(); const item = page.data[i];
-        const copyCfg = getPresets('copy')[page.copyPreset];
-        if(!copyCfg) { const txt = `${item.time} ${item.description}`; navigator.clipboard.writeText(txt).then(()=>showToast("复制成功(未绑定文案预设)")).catch(()=>showToast("复制失败")); return; }
+        const page = getActivePage(); 
+        const item = page.data[i];
         
-        let charName = "TA"; const charCfg = getPresets('char')[page.charPreset]; if(charCfg) charName = charCfg['char-name'];
-        const now = new Date(); const curM = now.getHours()*60 + now.getMinutes();
-        const [h,m] = item.time.split(':').map(Number); const t = h*60+m;
-        const diff = Math.abs(t - curM); const isPast = curM > t;
-        const tpl = isPast ? copyCfg['status-tpl-past'] : copyCfg['status-tpl-future'];
-        const txt = tpl.replace(/\${min}/g, diff).replace(/\${char}/g, charName).replace(/\${act}/g, item.description).replace(/\${time}/g, item.time);
-        navigator.clipboard.writeText(txt).then(()=>showToast("已按绑定文案复制")).catch(()=>showToast("复制失败"));
+        // 1. 获取角色名 (尝试从绑定配置拿，拿不到就用默认名)
+        let charName = "TA";
+        if(page.charPreset) {
+            const charCfg = getPresets('char')[page.charPreset];
+            if(charCfg && charCfg['char-name']) charName = charCfg['char-name'];
+        } else {
+            // 如果没绑定预设，尝试直接读取当前角色名
+            const role = roles.find(r=>r.id==activeRoleId);
+            if(role) charName = role.name;
+        }
+
+        // 2. 直接构造: ${char}在${time}${act}
+        const txt = `${charName}在${item.time}${item.description}`;
+        
+        navigator.clipboard.writeText(txt).then(()=>showToast("已复制: " + txt)).catch(()=>showToast("复制失败"));
       }
 
       function updateRealTimeStatus() {
